@@ -49,7 +49,7 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 4. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
 5. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
 6. **Add to Touch Bar** - click the Pock icon again and select **Customize Pock...** (`⌘P`), then drag the **Better Now Playing** widget down to the Touch Bar. 
-   > If nothing happens after clicking "Customize Pock...", repeat step 4 with the Widget Manager (from step 3) still open.
+   > If nothing happens after clicking **Customize Pock...**, repeat step 4 with the Widget Manager (from step 3) still open.
    
 ---
 
