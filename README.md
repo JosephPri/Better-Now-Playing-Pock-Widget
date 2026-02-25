@@ -44,10 +44,7 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 
 ### Steps
 1. **Download this repo** - click the green **Code** button above, then **Download ZIP**, and unzip it
-2. **Install dependencies** - open Terminal, drag the unzipped folder into the Terminal window, press Enter, then run:
-   ```
-   pod install
-   ```
+2. **Install dependencies** - open Terminal, type "`cd `" then drag the unzipped folder into the Terminal window and press Enter. Next, type `pod install` and press Enter
 3. **Open the project** - open the file called **`Better Now Playing.xcworkspace`** (not the `.xcodeproj` file)
 4. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
 5. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
