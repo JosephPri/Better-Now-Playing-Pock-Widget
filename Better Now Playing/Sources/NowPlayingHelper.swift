@@ -577,22 +577,26 @@ class NowPlayingHelper {
     }
     
     private func suppressNowPlayingTouchUI() {
-        // Tell launchd to never start this service again
-        let disable = Process()
-        disable.executableURL = URL(fileURLWithPath: "/bin/launchctl")
-        disable.arguments = ["disable", "gui/\(getuid())/com.apple.nowplayingtouchui"]
-        try? disable.run()
-        disable.waitUntilExit()
-        
-        // Clean unload — doesn't trigger a relaunch the way SIGTERM/killall does
-        let bootout = Process()
-        bootout.executableURL = URL(fileURLWithPath: "/bin/launchctl")
-        bootout.arguments = ["bootout", "gui/\(getuid())/com.apple.nowplayingtouchui"]
-        try? bootout.run()
-        bootout.waitUntilExit()
-        
-        killNowPlayingTouchUIIfRunning()
-        print("[NowPlayingHelper] NowPlayingTouchUI suppressed via launchctl")
+        // Run off the main thread — waitUntilExit() blocks, and blocking the main
+        // thread during Touch Bar layout causes a crash in NSTouchBarCustomizationPalette.
+        DispatchQueue.global(qos: .userInitiated).async {
+            let disable = Process()
+            disable.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+            disable.arguments = ["disable", "gui/\(getuid())/com.apple.nowplayingtouchui"]
+            try? disable.run()
+            disable.waitUntilExit()
+            
+            let bootout = Process()
+            bootout.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+            bootout.arguments = ["bootout", "gui/\(getuid())/com.apple.nowplayingtouchui"]
+            try? bootout.run()
+            bootout.waitUntilExit()
+            
+            DispatchQueue.main.async {
+                self.killNowPlayingTouchUIIfRunning()
+                print("[NowPlayingHelper] NowPlayingTouchUI suppressed via launchctl")
+            }
+        }
     }
     
     /// Lightweight check used by the repeating timer - only acts if the process
