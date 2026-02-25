@@ -25,9 +25,10 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 
 1. **Download the latest `.pock` file** from [Releases](https://github.com/JosephPri/Better-Now-Playing-Pock-Widget/releases)
 2. **Install in Pock** - Double-click/open the `.pock` file, Pock installs it automatically
+   > If MacOS prevents you from opening the file for security reasons, navigate to **System Settings** > **Privacy and Security** and scroll until you see `"Better Now Playing.pock" was blocked to protect your Mac` and click **Open Anyway**
 3. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
 4. **Add to Touch Bar** - click the Pock icon again and select **Customize Pock...** (`⌘P`), then drag the **Better Now Playing** widget down to the Touch Bar. 
-   > If nothing happens after clicking "Customize Pock...", repeat step 4 with the Widget Manager (from step 3) still open.
+   > If nothing happens after clicking **Customize Pock...**, repeat step 4 with the Widget Manager (from step 3) still open.
 
 ---
 
