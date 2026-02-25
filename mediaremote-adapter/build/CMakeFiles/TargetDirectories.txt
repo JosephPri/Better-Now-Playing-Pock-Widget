@@ -1,0 +1,4 @@
+/Users/joseph/Desktop/Better-Now-Playing-Pock-Widget-main/mediaremote-adapter/build/CMakeFiles/MediaRemoteAdapter.dir
+/Users/joseph/Desktop/Better-Now-Playing-Pock-Widget-main/mediaremote-adapter/build/CMakeFiles/MediaRemoteAdapterTestClient.dir
+/Users/joseph/Desktop/Better-Now-Playing-Pock-Widget-main/mediaremote-adapter/build/CMakeFiles/edit_cache.dir
+/Users/joseph/Desktop/Better-Now-Playing-Pock-Widget-main/mediaremote-adapter/build/CMakeFiles/rebuild_cache.dir

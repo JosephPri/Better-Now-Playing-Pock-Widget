@@ -1,11 +1,13 @@
-# Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
+#
+#  Podfile
+#  Better Now Playing
+#
+#  Created by JosephPri
+#
 
-target 'NowPlaying' do
-  # Comment the next line if you don't want to use dynamic frameworks
+target 'Better Now Playing' do
   use_frameworks!
 
-  # Pods for NowPlaying
   pod 'PockKit'
 
 end

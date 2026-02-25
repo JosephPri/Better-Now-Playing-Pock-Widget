@@ -1,0 +1,544 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		15254536DCFC1F87BB31EF61 /* Pods_Better_Now_Playing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9D21B4167D6458822FC328 /* Pods_Better_Now_Playing.framework */; };
+		28051DE32ADC4FE200B6FBD4 /* PockKit in Frameworks */ = {isa = PBXBuildFile; productRef = 28051DE22ADC4FE200B6FBD4 /* PockKit */; };
+		7C0848162F424D8500012860 /* mediaremote-adapter.pl in Resources */ = {isa = PBXBuildFile; fileRef = 7C0848152F424D8500012860 /* mediaremote-adapter.pl */; };
+		7C08481F2F424DDF00012860 /* NowPlayingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C08481A2F424DDF00012860 /* NowPlayingItem.swift */; };
+		7C0848212F424DDF00012860 /* NowPlayingWidgetStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C08481E2F424DDF00012860 /* NowPlayingWidgetStyle.swift */; };
+		7C0848222F424DDF00012860 /* NowPlayingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C08481B2F424DDF00012860 /* NowPlayingItemView.swift */; };
+		7C0848232F424DDF00012860 /* NowPlayingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C08481D2F424DDF00012860 /* NowPlayingWidget.swift */; };
+		7C0848242F424DDF00012860 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C08481C2F424DDF00012860 /* NowPlayingView.swift */; };
+		7C0848262F424E2100012860 /* MediaRemoteAdapterTestClient in Resources */ = {isa = PBXBuildFile; fileRef = 7C0848252F424E2100012860 /* MediaRemoteAdapterTestClient */; };
+		7C616CC32F477F9D000A8D37 /* NowPlayingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C616CC22F477F9D000A8D37 /* NowPlayingHelper.swift */; };
+		7C6CCB362F4789FF004094F8 /* MediaRemoteAdapter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7C6CCB342F4789FF004094F8 /* MediaRemoteAdapter.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7C6CCB3B2F478FCB004094F8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C6CCB3A2F478FCB004094F8 /* Info.plist */; };
+		7C9B66122F42EC61009C10A2 /* MediaRemoteAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9B66102F42EC61009C10A2 /* MediaRemoteAdapter.swift */; };
+		7CE0569A2F4251DC00A31AE8 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE056992F4251DC00A31AE8 /* Preferences.swift */; };
+		7CE0569B2F4251DC00A31AE8 /* NowPlayingPreferencePane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE056972F4251DC00A31AE8 /* NowPlayingPreferencePane.swift */; };
+		7CE0569C2F4251DC00A31AE8 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CE0568F2F4251DC00A31AE8 /* Media.xcassets */; };
+		7CE0569D2F4251DC00A31AE8 /* NowPlayingPreferencePane.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7CE056962F4251DC00A31AE8 /* NowPlayingPreferencePane.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7C6CCB372F4789FF004094F8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7C6CCB362F4789FF004094F8 /* MediaRemoteAdapter.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		28051DD42ADC4FA400B6FBD4 /* Better Now Playing.pock */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Better Now Playing.pock"; sourceTree = BUILT_PRODUCTS_DIR; };
+		28051DDA2ADC4FA400B6FBD4 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		7C0848152F424D8500012860 /* mediaremote-adapter.pl */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = "mediaremote-adapter.pl"; sourceTree = "<group>"; };
+		7C08481A2F424DDF00012860 /* NowPlayingItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingItem.swift; sourceTree = "<group>"; };
+		7C08481B2F424DDF00012860 /* NowPlayingItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingItemView.swift; sourceTree = "<group>"; };
+		7C08481C2F424DDF00012860 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
+		7C08481D2F424DDF00012860 /* NowPlayingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingWidget.swift; sourceTree = "<group>"; };
+		7C08481E2F424DDF00012860 /* NowPlayingWidgetStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingWidgetStyle.swift; sourceTree = "<group>"; };
+		7C0848252F424E2100012860 /* MediaRemoteAdapterTestClient */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = MediaRemoteAdapterTestClient; sourceTree = "<group>"; };
+		7C616CC22F477F9D000A8D37 /* NowPlayingHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingHelper.swift; sourceTree = "<group>"; };
+		7C6CCB342F4789FF004094F8 /* MediaRemoteAdapter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaRemoteAdapter.framework; path = "mediaremote-adapter/build/MediaRemoteAdapter.framework"; sourceTree = "<group>"; };
+		7C6CCB3A2F478FCB004094F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7C9B66102F42EC61009C10A2 /* MediaRemoteAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRemoteAdapter.swift; sourceTree = "<group>"; };
+		7CE0568F2F4251DC00A31AE8 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		7CE056902F4251DC00A31AE8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/NowPlayingPreferencePane.xib; sourceTree = "<group>"; };
+		7CE056912F4251DC00A31AE8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NowPlayingPreferencePane.strings; sourceTree = "<group>"; };
+		7CE056922F4251DC00A31AE8 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/NowPlayingPreferencePane.strings; sourceTree = "<group>"; };
+		7CE056932F4251DC00A31AE8 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/NowPlayingPreferencePane.strings; sourceTree = "<group>"; };
+		7CE056942F4251DC00A31AE8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/NowPlayingPreferencePane.strings"; sourceTree = "<group>"; };
+		7CE056952F4251DC00A31AE8 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/NowPlayingPreferencePane.strings"; sourceTree = "<group>"; };
+		7CE056972F4251DC00A31AE8 /* NowPlayingPreferencePane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingPreferencePane.swift; sourceTree = "<group>"; };
+		7CE056992F4251DC00A31AE8 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		90E50D42C88D260AA7AC1C43 /* Pods-Better Now Playing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Better Now Playing.release.xcconfig"; path = "Target Support Files/Pods-Better Now Playing/Pods-Better Now Playing.release.xcconfig"; sourceTree = "<group>"; };
+		B36593E2DE02517A4BDBDAE6 /* Pods-Better Now Playing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Better Now Playing.debug.xcconfig"; path = "Target Support Files/Pods-Better Now Playing/Pods-Better Now Playing.debug.xcconfig"; sourceTree = "<group>"; };
+		BD9D21B4167D6458822FC328 /* Pods_Better_Now_Playing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Better_Now_Playing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		28051DD02ADC4FA400B6FBD4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28051DE32ADC4FE200B6FBD4 /* PockKit in Frameworks */,
+				15254536DCFC1F87BB31EF61 /* Pods_Better_Now_Playing.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		28051DCA2ADC4FA300B6FBD4 = {
+			isa = PBXGroup;
+			children = (
+				28051DD62ADC4FA400B6FBD4 /* Better Now Playing */,
+				28051DD52ADC4FA400B6FBD4 /* Products */,
+				2EE39768EB7C743A5E382BDD /* Frameworks */,
+				4E93E2194AB97F6E933D18E6 /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		28051DD52ADC4FA400B6FBD4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				28051DD42ADC4FA400B6FBD4 /* Better Now Playing.pock */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		28051DD62ADC4FA400B6FBD4 /* Better Now Playing */ = {
+			isa = PBXGroup;
+			children = (
+				7CE0568F2F4251DC00A31AE8 /* Media.xcassets */,
+				7CE056982F4251DC00A31AE8 /* NowPlayingPreferencePane */,
+				7CE056992F4251DC00A31AE8 /* Preferences.swift */,
+				7C0848252F424E2100012860 /* MediaRemoteAdapterTestClient */,
+				7C0848152F424D8500012860 /* mediaremote-adapter.pl */,
+				28051DDA2ADC4FA400B6FBD4 /* Podfile */,
+				28051DD72ADC4FA400B6FBD4 /* Sources */,
+				7C6CCB3A2F478FCB004094F8 /* Info.plist */,
+			);
+			path = "Better Now Playing";
+			sourceTree = "<group>";
+		};
+		28051DD72ADC4FA400B6FBD4 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				7C08481A2F424DDF00012860 /* NowPlayingItem.swift */,
+				7C08481B2F424DDF00012860 /* NowPlayingItemView.swift */,
+				7C08481C2F424DDF00012860 /* NowPlayingView.swift */,
+				7C08481D2F424DDF00012860 /* NowPlayingWidget.swift */,
+				7C08481E2F424DDF00012860 /* NowPlayingWidgetStyle.swift */,
+				7C9B66102F42EC61009C10A2 /* MediaRemoteAdapter.swift */,
+				7C616CC22F477F9D000A8D37 /* NowPlayingHelper.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		2EE39768EB7C743A5E382BDD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7C6CCB342F4789FF004094F8 /* MediaRemoteAdapter.framework */,
+				BD9D21B4167D6458822FC328 /* Pods_Better_Now_Playing.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4E93E2194AB97F6E933D18E6 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B36593E2DE02517A4BDBDAE6 /* Pods-Better Now Playing.debug.xcconfig */,
+				90E50D42C88D260AA7AC1C43 /* Pods-Better Now Playing.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		7CE056982F4251DC00A31AE8 /* NowPlayingPreferencePane */ = {
+			isa = PBXGroup;
+			children = (
+				7CE056962F4251DC00A31AE8 /* NowPlayingPreferencePane.xib */,
+				7CE056972F4251DC00A31AE8 /* NowPlayingPreferencePane.swift */,
+			);
+			path = NowPlayingPreferencePane;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		28051DD32ADC4FA400B6FBD4 /* Better Now Playing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28051DDE2ADC4FA400B6FBD4 /* Build configuration list for PBXNativeTarget "Better Now Playing" */;
+			buildPhases = (
+				0B84BA7DE4CC86E136EB1A2E /* [CP] Check Pods Manifest.lock */,
+				28051DCF2ADC4FA400B6FBD4 /* Sources */,
+				28051DD02ADC4FA400B6FBD4 /* Frameworks */,
+				28051DD12ADC4FA400B6FBD4 /* Resources */,
+				28051DD22ADC4FA400B6FBD4 /* [PK] Install widget */,
+				7C6CCB372F4789FF004094F8 /* Embed Frameworks */,
+				7CE0568E2F4250CB00A31AE8 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Better Now Playing";
+			packageProductDependencies = (
+				28051DE22ADC4FE200B6FBD4 /* PockKit */,
+			);
+			productName = "Better Now Playing";
+			productReference = 28051DD42ADC4FA400B6FBD4 /* Better Now Playing.pock */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		28051DCB2ADC4FA300B6FBD4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					28051DD32ADC4FA400B6FBD4 = {
+						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 2620;
+					};
+				};
+			};
+			buildConfigurationList = 28051DCE2ADC4FA300B6FBD4 /* Build configuration list for PBXProject "Better Now Playing" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+				it,
+				"zh-Hant",
+				tr,
+			);
+			mainGroup = 28051DCA2ADC4FA300B6FBD4;
+			packageReferences = (
+				28051DE12ADC4FE200B6FBD4 /* XCRemoteSwiftPackageReference "pockkit" */,
+			);
+			productRefGroup = 28051DD52ADC4FA400B6FBD4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				28051DD32ADC4FA400B6FBD4 /* Better Now Playing */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		28051DD12ADC4FA400B6FBD4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CE0569C2F4251DC00A31AE8 /* Media.xcassets in Resources */,
+				7CE0569D2F4251DC00A31AE8 /* NowPlayingPreferencePane.xib in Resources */,
+				7C0848162F424D8500012860 /* mediaremote-adapter.pl in Resources */,
+				7C6CCB3B2F478FCB004094F8 /* Info.plist in Resources */,
+				7C0848262F424E2100012860 /* MediaRemoteAdapterTestClient in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0B84BA7DE4CC86E136EB1A2E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Better Now Playing-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		28051DD22ADC4FA400B6FBD4 /* [PK] Install widget */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[PK] Install widget";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Install widget.\necho \"[${PRODUCT_NAME}.pock] Starting installation\"\nFILEPATH=$TARGET_BUILD_DIR/$PRODUCT_NAME.pock \nopen \"$FILEPATH\"\n";
+		};
+		7CE0568E2F4250CB00A31AE8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy TinyConstraints\ncp -R \"${BUILD_DIR}/Debug/TinyConstraints/TinyConstraints.framework\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.pock/Contents/Frameworks/\" 2>/dev/null || true\ncodesign --force --sign \"${CODE_SIGN_IDENTITY}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.pock/Contents/Frameworks/TinyConstraints.framework\" 2>/dev/null || true\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		28051DCF2ADC4FA400B6FBD4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7C08481F2F424DDF00012860 /* NowPlayingItem.swift in Sources */,
+				7CE0569A2F4251DC00A31AE8 /* Preferences.swift in Sources */,
+				7CE0569B2F4251DC00A31AE8 /* NowPlayingPreferencePane.swift in Sources */,
+				7C0848212F424DDF00012860 /* NowPlayingWidgetStyle.swift in Sources */,
+				7C0848222F424DDF00012860 /* NowPlayingItemView.swift in Sources */,
+				7C0848232F424DDF00012860 /* NowPlayingWidget.swift in Sources */,
+				7C0848242F424DDF00012860 /* NowPlayingView.swift in Sources */,
+				7C9B66122F42EC61009C10A2 /* MediaRemoteAdapter.swift in Sources */,
+				7C616CC32F477F9D000A8D37 /* NowPlayingHelper.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		7CE056962F4251DC00A31AE8 /* NowPlayingPreferencePane.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7CE056902F4251DC00A31AE8 /* Base */,
+				7CE056912F4251DC00A31AE8 /* en */,
+				7CE056922F4251DC00A31AE8 /* it */,
+				7CE056932F4251DC00A31AE8 /* tr */,
+				7CE056942F4251DC00A31AE8 /* zh-Hans */,
+				7CE056952F4251DC00A31AE8 /* zh-Hant */,
+			);
+			name = NowPlayingPreferencePane.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		28051DDC2ADC4FA400B6FBD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Better Now Playing/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 12.7;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		28051DDD2ADC4FA400B6FBD4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Better Now Playing/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 12.7;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		28051DDF2ADC4FA400B6FBD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B36593E2DE02517A4BDBDAE6 /* Pods-Better Now Playing.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/mediaremote-adapter/build",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Better Now Playing/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Better Now Playing";
+				INFOPLIST_KEY_NSPrincipalClass = Better_Now_Playing.NowPlayingWidget;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Application\\ Support/Pock/Widgets";
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JosephPri.Better-Now-Playing";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = pock;
+			};
+			name = Debug;
+		};
+		28051DE02ADC4FA400B6FBD4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 90E50D42C88D260AA7AC1C43 /* Pods-Better Now Playing.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/mediaremote-adapter/build",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Better Now Playing/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Better Now Playing";
+				INFOPLIST_KEY_NSPrincipalClass = Better_Now_Playing.NowPlayingWidget;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Application\\ Support/Pock/Widgets";
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JosephPri.Better-Now-Playing";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = pock;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		28051DCE2ADC4FA300B6FBD4 /* Build configuration list for PBXProject "Better Now Playing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28051DDC2ADC4FA400B6FBD4 /* Debug */,
+				28051DDD2ADC4FA400B6FBD4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		28051DDE2ADC4FA400B6FBD4 /* Build configuration list for PBXNativeTarget "Better Now Playing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28051DDF2ADC4FA400B6FBD4 /* Debug */,
+				28051DE02ADC4FA400B6FBD4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		28051DE12ADC4FE200B6FBD4 /* XCRemoteSwiftPackageReference "pockkit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pock/pockkit.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		28051DE22ADC4FE200B6FBD4 /* PockKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28051DE12ADC4FE200B6FBD4 /* XCRemoteSwiftPackageReference "pockkit" */;
+			productName = PockKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 28051DCB2ADC4FA300B6FBD4 /* Project object */;
+}

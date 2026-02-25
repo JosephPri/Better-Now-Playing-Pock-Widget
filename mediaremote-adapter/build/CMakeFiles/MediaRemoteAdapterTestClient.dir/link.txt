@@ -1,0 +1,1 @@
+/usr/bin/clang  -arch x86_64 -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/MediaRemoteAdapterTestClient.dir/src/test/main.m.o CMakeFiles/MediaRemoteAdapterTestClient.dir/src/test/NowPlayingTest.m.o -o MediaRemoteAdapterTestClient  -framework Foundation -framework MediaPlayer
