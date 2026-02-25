@@ -55,7 +55,7 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 
 ## Known Issues
 
-- The widget seems to stop checking for music after an extended period of time (seems to happen when MacBook is closes for a while), I should be able to fix it soon, but for now pock must be reloaded when this happens.
+- The widget seems to stop checking for music after an extended period of time (seems to happen when MacBook is closed for a while), I should be able to fix it soon, but for now pock must be reloaded (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**) when this happens.
 
 ---
 
