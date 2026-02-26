@@ -20,6 +20,8 @@
 		7C6CCB362F4789FF004094F8 /* MediaRemoteAdapter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7C6CCB342F4789FF004094F8 /* MediaRemoteAdapter.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7C6CCB3B2F478FCB004094F8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C6CCB3A2F478FCB004094F8 /* Info.plist */; };
 		7C9B66122F42EC61009C10A2 /* MediaRemoteAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9B66102F42EC61009C10A2 /* MediaRemoteAdapter.swift */; };
+		7CD60E5F2F4FB47A00AF330D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7CD60E5E2F4FB47A00AF330D /* README.md */; };
+		7CD60E612F504C8900AF330D /* gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 7CD60E602F504C8900AF330D /* gitignore */; };
 		7CE0569A2F4251DC00A31AE8 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE056992F4251DC00A31AE8 /* Preferences.swift */; };
 		7CE0569B2F4251DC00A31AE8 /* NowPlayingPreferencePane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE056972F4251DC00A31AE8 /* NowPlayingPreferencePane.swift */; };
 		7CE0569C2F4251DC00A31AE8 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CE0568F2F4251DC00A31AE8 /* Media.xcassets */; };
@@ -54,6 +56,8 @@
 		7C6CCB342F4789FF004094F8 /* MediaRemoteAdapter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaRemoteAdapter.framework; path = "mediaremote-adapter/build/MediaRemoteAdapter.framework"; sourceTree = "<group>"; };
 		7C6CCB3A2F478FCB004094F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7C9B66102F42EC61009C10A2 /* MediaRemoteAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRemoteAdapter.swift; sourceTree = "<group>"; };
+		7CD60E5E2F4FB47A00AF330D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		7CD60E602F504C8900AF330D /* gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = gitignore; sourceTree = "<group>"; };
 		7CE0568F2F4251DC00A31AE8 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		7CE056902F4251DC00A31AE8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/NowPlayingPreferencePane.xib; sourceTree = "<group>"; };
 		7CE056912F4251DC00A31AE8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NowPlayingPreferencePane.strings; sourceTree = "<group>"; };
@@ -88,6 +92,8 @@
 				28051DD52ADC4FA400B6FBD4 /* Products */,
 				2EE39768EB7C743A5E382BDD /* Frameworks */,
 				4E93E2194AB97F6E933D18E6 /* Pods */,
+				7CD60E5E2F4FB47A00AF330D /* README.md */,
+				7CD60E602F504C8900AF330D /* gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -228,6 +234,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CD60E5F2F4FB47A00AF330D /* README.md in Resources */,
+				7CD60E612F504C8900AF330D /* gitignore in Resources */,
 				7CE0569C2F4251DC00A31AE8 /* Media.xcassets in Resources */,
 				7CE0569D2F4251DC00A31AE8 /* NowPlayingPreferencePane.xib in Resources */,
 				7C0848162F424D8500012860 /* mediaremote-adapter.pl in Resources */,
