@@ -38,18 +38,33 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 - [Pock](https://pock.app) installed
 - Xcode (free on the Mac App Store)
 - CocoaPods - if you don't have it, open Terminal and run:
-  ```
+```
   sudo gem install cocoapods
-  ```
+```
+- CMake - if you don't have it, install [Homebrew](https://brew.sh) then run:
+```
+  brew install cmake
+```
 
 ### Steps
-1. **Clone this repo** - open XCode, select **Clone Git Repository...**, paste `https://github.com/JosephPri/Better-Now-Playing-Pock-Widget.git` and click **Clone**
-2. **Install dependencies** - open Terminal, type "`cd `" then drag the unzipped folder into the Terminal window and press Enter. Next, type `pod install` and press Enter
-3. **Open the project** - open the file called **`Better Now Playing.xcworkspace`** (not the `.xcodeproj` file)
-4. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
-5. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
-6. **Add to Touch Bar** - click the Pock icon again and select **Customize Pock...** (`⌘P`), then drag the **Better Now Playing** widget down to the Touch Bar. 
-   > If nothing happens after clicking **Customize Pock...**, repeat step 6 with the Widget Manager (from step 5) still open.
+1. **Clone this repo** - open XCode, select **Clone Git Repository...**, paste `https://github.com/JosephPri/Better-Now-Playing-Pock-Widget.git` and click **Clone**.
+2. **Run setup commands** - open Terminal, type "`cd `" then drag the cloned repo folder into the Terminal window and press Enter. Run:
+```
+   git submodule update --init
+   pod install
+```
+   Type "`cd `" again, then drag the **mediaremote-adapter** folder (inside the cloned repo) into the Terminal window and press Enter. Run:
+```
+   mkdir -p build
+   cd build
+   cmake ..
+   make
+```
+3. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
+> On first build, Pock may give an error. Simply press **⌘B** again to rebuild and it will work correctly.
+4. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
+5. **Add to Touch Bar** - click the Pock icon again and select **Customize Pock...** (`⌘P`), then drag the **Better Now Playing** widget down to the Touch Bar.
+   > If nothing happens after clicking **Customize Pock...**, repeat step 5 with the Widget Manager (from step 4) still open.
    
 ---
 
