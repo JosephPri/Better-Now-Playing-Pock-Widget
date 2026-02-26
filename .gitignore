@@ -6,6 +6,7 @@ Podfile.lock
 Pods/
 
 ## Userdata
-NowPlaying.xcodeproj/xcuserdata/
-NowPlaying.xcworkspace/xcuserdata/
-NowPlaying.xcodeproj/xcuserdata
+xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata
