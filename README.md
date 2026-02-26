@@ -53,14 +53,15 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
    git submodule update --init
    pod install
 ```
-   Type "`cd `" again, then drag the **mediaremote-adapter** folder (inside the cloned repo) into the Terminal window and press Enter. Copy and run:
+Type "`cd `" again, then drag the **mediaremote-adapter** folder (inside the cloned repo) into the Terminal window and press Enter. Copy and run:
 ```
    mkdir -p build
    cd build
    cmake ..
    make
 ```
-    You can now close Terminal
+You can now close Terminal.
+
 3. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
 > On first build, Pock may give an error. Simply press **⌘B** again to rebuild and it will work correctly.
 4. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
@@ -72,7 +73,7 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 ## Known Issues (current bugs while in beta, not limitations)
 
 - The widget seems to stop checking for music after an extended period of time (seems to happen when MacBook is closed for a while), I should be able to fix it soon, but for now pock must be reloaded (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**) when this happens.
-- The widget also seems to (sometimes) stop checking for music after a playlist ends, but does seem to fix itself by closing/opening music player or clicking some random combination of media controls. This of course can also be remedied by reloading pock (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**)
+- The widget also seems to (sometimes) stop checking for music after a playlist ends, but does seem to fix itself by closing/opening music player or clicking some random combination of media controls. This of course can also be remedied by reloading pock (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**).
 
 ---
 
