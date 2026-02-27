@@ -35,10 +35,8 @@ class NowPlayingItemView: PKDetailView {
         return CGFloat(size)
     }
     
-    /// The extra width the image takes beyond PKDetailView's assumed 24pt,
-    /// which we add back to maxWidth so text doesn't get clipped.
+    /// The extra width the image takes beyond PKDetailView's assumed 24pt
     private var artworkWidthBonus: CGFloat {
-        // Container height = 30pt - 2*inset, image is square so width = height
         let imageSize = 30 - (artworkInset * 2)
         return max(0, imageSize - 24)
     }
@@ -52,8 +50,7 @@ class NowPlayingItemView: PKDetailView {
         imageView.wantsLayer = true
         imageView.layer?.masksToBounds = true
         
-        // PKDetailView sets labelsContainer to .fillEqually which spreads
-        // title and artist apart as the image grows. Override to keep them tight.
+        // Keep title and artist tight together regardless of image size
         labelsContainer.distribution = .fillEqually
         labelsContainer.spacing = 0
         labelsContainer.alignment = .leading
@@ -88,8 +85,7 @@ class NowPlayingItemView: PKDetailView {
             imageView.constraints.filter { $0.firstAttribute == .width }.forEach { $0.isActive = false }
             imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
         }
-        // PKDetailView.updateContentWidth() uses hardcoded 24pt for image width in contentWidth.
-        // We recalculate the container width constraint using the actual image size, capped at maxWidth.
+        // Correct width constraint — PKDetailView assumes 24pt image, we use actual size
         let actualImagePt = 30 - (inset * 2)
         let correctedWidth = contentWidth - 24 + actualImagePt + contentContainer.spacing
         let cappedWidth = maxWidth > 0 ? min(correctedWidth, maxWidth) : correctedWidth
@@ -102,7 +98,28 @@ class NowPlayingItemView: PKDetailView {
         super.layout()
         if !shouldHideIcon {
             imageView.layer?.cornerRadius = imageView.bounds.height / 2 * 0.35
+            // Always keep anchor point at center so bounce animation scales from center
+            if let layer = imageView.layer, layer.anchorPoint != CGPoint(x: 0.5, y: 0.5) {
+                let frame = layer.frame
+                layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                layer.frame = frame
+            }
         }
+    }
+    
+    // PKDetailView.startBounceAnimation() is in a non-open extension so can't be overridden.
+    // We add our own smoother animation directly and call this instead.
+    private func startSmoothBounceAnimation() {
+        stopBounceAnimation()
+        guard let layer = imageView?.layer else { return }
+        let bounce = CABasicAnimation(keyPath: "transform.scale")
+        bounce.fromValue = 0.88
+        bounce.toValue = 1.0
+        bounce.duration = 1.0
+        bounce.autoreverses = true
+        bounce.repeatCount = .infinity
+        bounce.timingFunction = CAMediaTimingFunction(controlPoints: 0.45, 0.0, 0.55, 1.0)
+        layer.add(bounce, forKey: "kBounceAnimationKey")
     }
     
     internal func updateUIState(for item: NowPlayingItem?) {
@@ -123,8 +140,7 @@ class NowPlayingItemView: PKDetailView {
         } else {
             imageView.image = client.icon
         }
-        // Set maxWidth BEFORE set(title:) — updateConstraint is called inside set(title:)
-        // via updateContentWidth(), so maxWidth must be correct before that chain fires.
+        // Set maxWidth BEFORE set(title:) so updateConstraint sees the cap in time
         maxWidth = 160 + artworkWidthBonus
         
         var title = item.title ?? (item.artist == nil ? client.displayName : "Missing title") ?? "Missing title"
@@ -143,7 +159,7 @@ class NowPlayingItemView: PKDetailView {
     
     private func updateForNowPlayingState() {
         if Preferences[.animateIconWhilePlaying], self.nowPLayingItem?.isPlaying ?? false {
-            self.startBounceAnimation()
+            self.startSmoothBounceAnimation()
         } else {
             self.stopBounceAnimation()
         }

@@ -92,15 +92,9 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
             Preferences[.hideNowPlayingIfNoMedia] = button.state == .on
         case 1:
             Preferences[.animateIconWhilePlaying] = button.state == .on
-            if Preferences[.showMediaArtwork] {
-                Preferences[.showMediaArtwork] = !Preferences[.animateIconWhilePlaying]
-            }
             updateButtonsState()
         case 2:
             Preferences[.showMediaArtwork] = button.state == .on
-            if Preferences[.animateIconWhilePlaying] {
-                Preferences[.animateIconWhilePlaying] = !Preferences[.showMediaArtwork]
-            }
             updateButtonsState()
         case 3:
             Preferences[.invertSwipeGesture] = button.state == .on
