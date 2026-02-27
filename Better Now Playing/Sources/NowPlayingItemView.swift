@@ -1,10 +1,9 @@
 //
 //  NowPlayingItemView.swift
-//  Better Now Playing
+//  Pock
 //
 //  Created by Pierluigi Galdi on 17/02/2019.
 //  Copyright © 2019 Pierluigi Galdi. All rights reserved.
-//  Modified by JosephPri
 //
 
 import Foundation
@@ -27,36 +26,84 @@ class NowPlayingItemView: PKDetailView {
     
     /// Data
     private var nowPLayingItem: NowPlayingItem?
+    private var containerConstraints: [NSLayoutConstraint] = []
     
-    /// Stored image-size constraints, created once in didLoad
-    private var imageWidthConstraint: NSLayoutConstraint?
-    private var imageHeightConstraint: NSLayoutConstraint?
+    /// Returns the inset in points based on the artworkSize preference:
+    /// 0 = Extra Large (0pt = 60px), 1 = Large (1pt = 56px), 2 = Medium (2pt = 52px), 3 = Small (3pt = 48px)
+    private var artworkInset: CGFloat {
+        let size: Int = Preferences[.artworkSize]
+        return CGFloat(size)
+    }
     
+    /// The extra width the image takes beyond PKDetailView's assumed 24pt,
+    /// which we add back to maxWidth so text doesn't get clipped.
+    private var artworkWidthBonus: CGFloat {
+        // Container height = 30pt - 2*inset, image is square so width = height
+        let imageSize = 30 - (artworkInset * 2)
+        return max(0, imageSize - 24)
+    }
+
     override func didLoad() {
         canScrollTitle = true
         canScrollSubtitle = true
         titleView.numberOfLoop = 3
         subtitleView.numberOfLoop = 1
         
-        // Add rounded corners to imageView
         imageView.wantsLayer = true
-        imageView.layer?.cornerRadius = 5
         imageView.layer?.masksToBounds = true
         
-        // Create image-size constraints once; activate/deactivate as needed
-        if !shouldHideIcon {
-            let w = imageView.widthAnchor.constraint(equalToConstant: 60)
-            let h = imageView.heightAnchor.constraint(equalToConstant: 60)
-            imageWidthConstraint  = w
-            imageHeightConstraint = h
-            NSLayoutConstraint.activate([w, h])
-        }
+        // PKDetailView sets labelsContainer to .fillEqually which spreads
+        // title and artist apart as the image grows. Override to keep them tight.
+        labelsContainer.distribution = .fillEqually
+        labelsContainer.spacing = 0
+        labelsContainer.alignment = .leading
         
         updateUIState(for: nil)
         super.didLoad()
     }
     
-    // layout() override removed - constraints are set once in didLoad()
+    override func updateConstraint() {
+        super.updateConstraint()
+        guard let container = contentContainer, let superview = container.superview else { return }
+        // Remove PKDetailView's asymmetric top(4)+bottom(2) insets
+        superview.constraints.forEach {
+            guard ($0.firstItem as? NSView == container || $0.secondItem as? NSView == container) else { return }
+            if $0.firstAttribute == .top || $0.firstAttribute == .bottom ||
+               $0.secondAttribute == .top || $0.secondAttribute == .bottom {
+                $0.isActive = false
+            }
+        }
+        let inset = artworkInset
+        container.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.deactivate(containerConstraints)
+        containerConstraints = [
+            container.topAnchor.constraint(equalTo: superview.topAnchor, constant: inset),
+            container.bottomAnchor.constraint(equalTo: superview.bottomAnchor, constant: -inset),
+            container.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: superview.trailingAnchor)
+        ]
+        NSLayoutConstraint.activate(containerConstraints)
+        // Make image square at full available height
+        if !shouldHideIcon {
+            imageView.constraints.filter { $0.firstAttribute == .width }.forEach { $0.isActive = false }
+            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
+        }
+        // PKDetailView.updateContentWidth() uses hardcoded 24pt for image width in contentWidth.
+        // We recalculate the container width constraint using the actual image size, capped at maxWidth.
+        let actualImagePt = 30 - (inset * 2)
+        let correctedWidth = contentWidth - 24 + actualImagePt + contentContainer.spacing
+        let cappedWidth = maxWidth > 0 ? min(correctedWidth, maxWidth) : correctedWidth
+        if let widthConstraint = container.constraints.first(where: { $0.identifier == "contentContainer.width" }) {
+            widthConstraint.constant = cappedWidth
+        }
+    }
+    
+    override func layout() {
+        super.layout()
+        if !shouldHideIcon {
+            imageView.layer?.cornerRadius = imageView.bounds.height / 2 * 0.35
+        }
+    }
     
     internal func updateUIState(for item: NowPlayingItem?) {
         self.nowPLayingItem = item
@@ -66,26 +113,26 @@ class NowPlayingItemView: PKDetailView {
         guard let item = self.nowPLayingItem, let client = item.client else {
             let appBundleIdentifier: String = Preferences[.defaultPlayer]
             imageView.image = NSWorkspace.shared.applicationIcon(for: appBundleIdentifier, fallbackFileType: "mp3")
-            maxWidth = 160
+            maxWidth = 160 + artworkWidthBonus
             set(title: NSWorkspace.shared.applicationName(for: appBundleIdentifier))
             subtitleView.isHidden = true
             return
         }
-        // MARK: Artwork
         if let artwork = item.artwork {
             imageView.image = artwork
         } else {
             imageView.image = client.icon
         }
-        // TODO: Localize hardcoded strings
-        // MARK: Title
+        // Set maxWidth BEFORE set(title:) — updateConstraint is called inside set(title:)
+        // via updateContentWidth(), so maxWidth must be correct before that chain fires.
+        maxWidth = 160 + artworkWidthBonus
+        
         var title = item.title ?? (item.artist == nil ? client.displayName : "Missing title") ?? "Missing title"
         if title.isEmpty {
             title = "Missing title"
         }
         set(title: title)
         
-        // MARK: Subtitle
         if let subtitle = item.artist ?? (item.title != nil ? client.displayName : nil), subtitle.isEmpty == false {
             subtitleView.isHidden = false
             set(subtitle: subtitle)
@@ -97,7 +144,7 @@ class NowPlayingItemView: PKDetailView {
     private func updateForNowPlayingState() {
         if Preferences[.animateIconWhilePlaying], self.nowPLayingItem?.isPlaying ?? false {
             self.startBounceAnimation()
-        }else {
+        } else {
             self.stopBounceAnimation()
         }
     }
@@ -109,7 +156,7 @@ class NowPlayingItemView: PKDetailView {
     override open func didSwipeLeftHandler() {
         if Preferences[.invertSwipeGesture] {
             self.didSwipeRight?()
-        }else {
+        } else {
             self.didSwipeLeft?()
         }
     }
@@ -117,7 +164,7 @@ class NowPlayingItemView: PKDetailView {
     override open func didSwipeRightHandler() {
         if Preferences[.invertSwipeGesture] {
             self.didSwipeLeft?()
-        }else {
+        } else {
             self.didSwipeRight?()
         }
     }

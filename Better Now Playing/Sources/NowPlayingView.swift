@@ -1,10 +1,9 @@
 //
 //  NowPlayingView.swift
-//  Better Now Playing
+//  Pock
 //
 //  Created by Pierluigi Galdi on 14/12/2019.
 //  Copyright © 2019 Pierluigi Galdi. All rights reserved.
-//  Modified by JosephPri
 //
 
 import Foundation
@@ -69,6 +68,7 @@ class NowPlayingView: PKView {
     deinit {
         NSLog("[NOW_PLAYING]: NowPlayingView - deinit")
         NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
         helper = nil
         itemView?.removeFromSuperview()
         itemView = nil
@@ -79,6 +79,7 @@ class NowPlayingView: PKView {
     private func registerForNotifications() {
         NSLog("[NOW_PLAYING]: NowPlayingView - register for notifications")
         NotificationCenter.default.addObserver(self, selector: #selector(configureUIElements), name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkSizeChange), name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
     }
     
     convenience init(frame: NSRect, shouldLoadHelper: Bool) {
@@ -98,6 +99,13 @@ class NowPlayingView: PKView {
         stackView.distribution = .fillProportionally
         addSubview(stackView)
         stackView.edgesToSuperview()
+    }
+    
+    @objc private func handleArtworkSizeChange() {
+        // Just re-layout the existing itemView without rebuilding it or clearing state
+        itemView?.updateConstraint()
+        itemView?.needsLayout = true
+        itemView?.layout()
     }
     
     @objc private func configureUIElements() {
@@ -195,7 +203,7 @@ class NowPlayingView: PKView {
     
     /// Handlers
     @objc private func togglePlayPause() {
-        if NSWorkspace.shared.runningApplications.compactMap({ $0.bundleIdentifier }).contains(item?.client?.bundleIdentifier), item?.title != nil {
+        if NSWorkspace.shared.runningApplications.compactMap({ $0.bundleIdentifier }).contains(item?.client?.bundleIdentifier ?? ""), item?.title != nil {
             helper?.togglePlayingState()
         } else {
             didLongPressHandler()

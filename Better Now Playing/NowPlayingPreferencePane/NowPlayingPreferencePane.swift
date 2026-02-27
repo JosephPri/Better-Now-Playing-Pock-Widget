@@ -26,6 +26,7 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     @IBOutlet private weak var animateIconWhilePlaying: NSButton!
     @IBOutlet private weak var showMediaArtwork:        NSButton!
     @IBOutlet private weak var invertSwipeGesture:      NSButton!
+    @IBOutlet private weak var artworkSizePopup:        NSPopUpButton!
     
     func reset() {
         Preferences.reset()
@@ -42,6 +43,13 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
         }
         updateButtonsState()
         setupImageViewClickGesture()
+        // Set artwork size popup to saved preference
+        // Tags: 0=Large, 1=Medium, 2=Small, 3=Extra Small
+        let savedSize: Int = Preferences[.artworkSize]
+        let titles = ["Large", "Medium", "Small", "Extra Small"]
+        if savedSize < titles.count {
+            artworkSizePopup?.selectItem(withTitle: titles[savedSize])
+        }
     }
     
     private func updateButtonsState() {
@@ -106,6 +114,11 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
         }
         NotificationCenter.default.post(name: .mrPlaybackQueueContentItemsChanged, object: nil)
         NotificationCenter.default.post(name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
+    }
+    
+    @IBAction private func didChangeArtworkSize(_ sender: NSPopUpButton) {
+        Preferences[.artworkSize] = sender.indexOfSelectedItem
+        NotificationCenter.default.post(name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
     }
     
 }
