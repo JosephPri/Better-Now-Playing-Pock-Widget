@@ -14,9 +14,9 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 
 ## Features
 
-- **Works with all streaming services** - Apple Music, Spotify, YouTube, and more
-- **Fully working album art** with rounded corners (was a beta in the original, but is now stable)
-- **Automatically removes the built-in macOS Now Playing Touch Bar icon** that would otherwise appear alongside the widget (a feature not present in the original)
+- **Works with all media players** - Apple Music, Spotify, YouTube, etc.
+- **Revamped album art** - fully working with rounded corners and adjustable size
+- **Automatically removes the built-in macOS Now Playing Touch Bar icon** (looks like bar graph in circle) It would otherwise appear alongside the widget and be quite redundant and annoying
 - **Uses mediaremote-adapter** as a workaround for Apple's API privatization in macOS 15.4+
 
 ---
