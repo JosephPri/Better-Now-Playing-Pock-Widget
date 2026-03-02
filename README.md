@@ -48,17 +48,15 @@ In macOS 15.4, Apple quietly restricted the private MediaRemote framework so thi
 
 ### Steps
 1. **Clone this repo** - open XCode, select **Clone Git Repository...**, paste `https://github.com/JosephPri/Better-Now-Playing-Pock-Widget.git` and click **Clone**.
-2. **Run setup commands** - open Terminal, type "`cd `" then drag the cloned repo folder into the Terminal window and press Enter. Copy and run:
+2. **Run setup commands** - open Terminal, type "`cd `" then drag the cloned repo folder (named `Better-Now-Playing-Pock-Widget`) into the Terminal window and press Enter. Copy and run:
 ```
-   git submodule update --init
-   pod install
-```
-Type "`cd `" again, then drag the **mediaremote-adapter** folder (inside the cloned repo) into the Terminal window and press Enter. Copy and run:
-```
-   mkdir -p build
-   cd build
-   cmake ..
-   make
+git submodule update --init
+pod install
+cd ./mediaremote-adapter
+mkdir -p build
+cd build
+cmake ..
+make
 ```
 You can now close Terminal.
 
