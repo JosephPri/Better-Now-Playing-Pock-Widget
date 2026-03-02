@@ -9,6 +9,7 @@ import Foundation
 
 internal let didChangeNowPlayingWidgetStyle = "didChangeNowPlayingWidgetStyle"
 internal let didChangeArtworkSizeNotification = "didChangeArtworkSize"
+internal let didChangeArtworkGlowNotification = "didChangeArtworkGlow"
 
 internal struct Preferences {
     internal enum Keys: String {
@@ -19,6 +20,7 @@ internal struct Preferences {
         case invertSwipeGesture
         case defaultPlayer
         case artworkSize
+        case artworkGlow
     }
     static subscript<T>(_ key: Keys) -> T {
         get {
@@ -40,8 +42,10 @@ internal struct Preferences {
                     } else {
                         return "com.apple.iTunes" as! T
                     }
+                case .artworkGlow:
+                    return true as! T
                 case .artworkSize:
-                    return 1 as! T  // Default: large (0pt inset)
+                    return 3 as! T
                 }
             }
             return value
@@ -56,7 +60,8 @@ internal struct Preferences {
         Preferences[.animateIconWhilePlaying] = false
         Preferences[.showMediaArtwork] = true
         Preferences[.invertSwipeGesture] = false
-        Preferences[.artworkSize] = 1
+        Preferences[.artworkGlow] = true
+        Preferences[.artworkSize] = 0
         if #available(OSX 10.15, *) {
             Preferences[.defaultPlayer] = "com.apple.Music"
         } else {

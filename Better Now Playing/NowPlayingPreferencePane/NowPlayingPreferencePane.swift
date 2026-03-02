@@ -27,6 +27,7 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     @IBOutlet private weak var showMediaArtwork:        NSButton!
     @IBOutlet private weak var invertSwipeGesture:      NSButton!
     @IBOutlet private weak var artworkSizeSlider:        NSSlider!
+    @IBOutlet private weak var artworkGlowCheckbox:      NSButton!
     
     func reset() {
         Preferences.reset()
@@ -52,6 +53,7 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
         animateIconWhilePlaying.state = Preferences[.animateIconWhilePlaying] ? .on : .off
         showMediaArtwork.state        = Preferences[.showMediaArtwork]        ? .on : .off
         invertSwipeGesture.state      = Preferences[.invertSwipeGesture]      ? .on : .off
+        artworkGlowCheckbox?.state    = Preferences[.artworkGlow]             ? .on : .off
     }
     
     private func setupImageViewClickGesture() {
@@ -98,6 +100,8 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
             updateButtonsState()
         case 3:
             Preferences[.invertSwipeGesture] = button.state == .on
+        case 4:
+            Preferences[.artworkGlow] = button.state == .on
         default:
             return
         }
@@ -108,6 +112,11 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     @IBAction private func didChangeArtworkSize(_ sender: NSSlider) {
         Preferences[.artworkSize] = sender.integerValue
         NotificationCenter.default.post(name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
+    }
+    
+    @IBAction private func didToggleArtworkGlow(_ sender: NSButton) {
+        Preferences[.artworkGlow] = sender.state == .on
+        NotificationCenter.default.post(name: Notification.Name(didChangeArtworkGlowNotification), object: nil)
     }
     
 }

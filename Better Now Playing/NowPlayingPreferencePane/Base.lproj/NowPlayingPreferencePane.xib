@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="NowPlayingPreferencePane" customModule="Better_Now_Playing" customModuleProvider="target">
             <connections>
                 <outlet property="animateIconWhilePlaying" destination="VA9-bL-MAf" id="g05-wM-Sav"/>
+                <outlet property="artworkGlowCheckbox" destination="V4d-IO-PCr" id="OhI-ZJ-tRe"/>
                 <outlet property="artworkSizeSlider" destination="GPd-g3-A1w" id="MG3-aQ-zAs"/>
                 <outlet property="defaultRadioButton" destination="hjN-rN-Bz7" id="DuT-sv-3ur"/>
                 <outlet property="hideWidgetIfNoMedia" destination="o7u-jf-oUS" id="l0H-jI-rKk"/>
@@ -23,14 +24,14 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="584" height="433"/>
+            <rect key="frame" x="0.0" y="0.0" width="584" height="530"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="18" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XnL-G6-kic">
-                    <rect key="frame" x="20" y="20" width="544" height="393"/>
+                    <rect key="frame" x="20" y="20" width="544" height="490"/>
                     <subviews>
                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lc0-ND-UTy">
-                            <rect key="frame" x="-2" y="377" width="87" height="16"/>
+                            <rect key="frame" x="-2" y="474" width="87" height="16"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Choose style:" id="ooI-7i-Wfp">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -38,7 +39,7 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vs-1x-7qT">
-                            <rect key="frame" x="0.0" y="259" width="544" height="100"/>
+                            <rect key="frame" x="0.0" y="356" width="544" height="100"/>
                             <subviews>
                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lVi-bn-Iha">
                                     <rect key="frame" x="-3" y="-3" width="174" height="106"/>
@@ -86,10 +87,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="169" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M9l-1b-aku">
-                            <rect key="frame" x="73" y="220" width="398" height="21"/>
+                            <rect key="frame" x="73" y="282" width="398" height="56"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hjN-rN-Bz7">
-                                    <rect key="frame" x="0.0" y="5" width="22" height="16"/>
+                                    <rect key="frame" x="0.0" y="40" width="22" height="16"/>
                                     <buttonCell key="cell" type="radio" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="aEQ-zE-ACK">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -99,7 +100,7 @@
                                     </connections>
                                 </button>
                                 <button tag="1" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SWC-PR-hvh">
-                                    <rect key="frame" x="191" y="5" width="16" height="16"/>
+                                    <rect key="frame" x="191" y="40" width="16" height="16"/>
                                     <buttonCell key="cell" type="radio" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8v9-US-mJe">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -109,7 +110,7 @@
                                     </connections>
                                 </button>
                                 <button tag="2" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z1t-VA-Pez">
-                                    <rect key="frame" x="376" y="5" width="22" height="16"/>
+                                    <rect key="frame" x="376" y="40" width="22" height="16"/>
                                     <buttonCell key="cell" type="radio" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="ey0-xf-jXW">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -131,10 +132,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView wantsLayer="YES" distribution="fill" orientation="vertical" alignment="leading" spacing="15" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="II5-0Z-P7k">
-                            <rect key="frame" x="0.0" y="0.0" width="371" height="202"/>
+                            <rect key="frame" x="0.0" y="0.0" width="371" height="264"/>
                             <subviews>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UTf-kt-Dtb" userLabel="Choose album art size:">
-                                    <rect key="frame" x="-2" y="186" width="143" height="16"/>
+                                    <rect key="frame" x="-2" y="248" width="143" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Choose album art size:" id="uNn-Ln-Bq5">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -142,7 +143,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aLP-Ia-hyq">
-                                    <rect key="frame" x="0.0" y="155" width="134" height="16"/>
+                                    <rect key="frame" x="0.0" y="217" width="134" height="16"/>
                                     <subviews>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="csb-1w-dM1" userLabel="Choose album art size:">
                                             <rect key="frame" x="-2" y="0.0" width="37" height="16"/>
@@ -181,32 +182,50 @@
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
-                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PWz-JU-YDf" userLabel="Spacer">
-                                    <rect key="frame" x="-2" y="124" width="54" height="16"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" id="ScS-jV-p1A">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XSw-wl-Lz7" userLabel="Choose album art size:">
+                                    <rect key="frame" x="-2" y="186" width="124" height="16"/>
+                                    <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Choose animations:" id="9XK-Yd-J8l">
+                                        <font key="font" metaFont="system"/>
+                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <button tag="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VA9-bL-MAf">
+                                    <rect key="frame" x="0.0" y="155" width="210" height="16"/>
+                                    <buttonCell key="cell" type="check" title="Animate icon size while playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="4Dg-PS-L8w">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="didChangeCheckboxState:" target="-2" id="lQq-oG-wDB"/>
+                                    </connections>
+                                </button>
+                                <button tag="4" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="V4d-IO-PCr">
+                                    <rect key="frame" x="0.0" y="124" width="186" height="16"/>
+                                    <buttonCell key="cell" type="check" title="Animate glow while playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="EcV-hw-vXl">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="didChangeCheckboxState:" target="-2" id="yhJ-7l-FVw"/>
+                                    </connections>
+                                </button>
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8eF-Oh-FZC" userLabel="Choose album art size:">
+                                    <rect key="frame" x="-2" y="93" width="107" height="16"/>
+                                    <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Choose settings:" id="0xa-RU-TrT">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="o7u-jf-oUS">
-                                    <rect key="frame" x="0.0" y="93" width="181" height="16"/>
+                                    <rect key="frame" x="0.0" y="62" width="181" height="16"/>
                                     <buttonCell key="cell" type="check" title="Hide while no item playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="krA-nL-skn">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
                                         <action selector="didChangeCheckboxState:" target="-2" id="Fp2-R4-Oh4"/>
-                                    </connections>
-                                </button>
-                                <button tag="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VA9-bL-MAf">
-                                    <rect key="frame" x="0.0" y="62" width="183" height="16"/>
-                                    <buttonCell key="cell" type="check" title="Animate icon while playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="4Dg-PS-L8w">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="didChangeCheckboxState:" target="-2" id="lQq-oG-wDB"/>
                                     </connections>
                                 </button>
                                 <button tag="2" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="65s-FT-RlJ" userLabel="Show media artwork">
@@ -238,8 +257,12 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -275,7 +298,7 @@
                 <constraint firstAttribute="trailing" secondItem="XnL-G6-kic" secondAttribute="trailing" constant="20" id="Uuf-us-G5W"/>
                 <constraint firstItem="XnL-G6-kic" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="uNb-YJ-LRJ"/>
             </constraints>
-            <point key="canvasLocation" x="23" y="226.5"/>
+            <point key="canvasLocation" x="23" y="226"/>
         </customView>
     </objects>
     <resources>

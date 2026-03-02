@@ -97,13 +97,21 @@ class NowPlayingItemView: PKDetailView {
     override func layout() {
         super.layout()
         if !shouldHideIcon {
-            imageView.layer?.cornerRadius = imageView.bounds.height / 2 * 0.35
-            // Always keep anchor point at center so bounce animation scales from center
+            let radius = imageView.bounds.height / 2 * 0.35
+            imageView.layer?.cornerRadius = radius
+            // Keep anchor point at center for bounce animation
             if let layer = imageView.layer, layer.anchorPoint != CGPoint(x: 0.5, y: 0.5) {
                 let frame = layer.frame
                 layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
                 layer.frame = frame
             }
+            // Keep glow overlay frame in sync with image size if it exists
+            imageView.layer?.sublayers?
+                .filter { $0.name == "glowOverlayLayer" }
+                .forEach {
+                    $0.frame = imageView.layer!.bounds
+                    $0.cornerRadius = radius
+                }
         }
     }
     
@@ -120,6 +128,86 @@ class NowPlayingItemView: PKDetailView {
         bounce.repeatCount = .infinity
         bounce.timingFunction = CAMediaTimingFunction(controlPoints: 0.45, 0.0, 0.55, 1.0)
         layer.add(bounce, forKey: "kBounceAnimationKey")
+    }
+    
+    /// Returns the average luminance of the current artwork (0=black, 1=white)
+    private func artworkLuminance() -> CGFloat {
+        guard let image = imageView.image,
+              let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return 0.5 }
+        // Scale down to 1x1 to get average color cheaply
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        var pixel = [UInt8](repeating: 0, count: 4)
+        guard let ctx = CGContext(data: &pixel, width: 1, height: 1,
+                                  bitsPerComponent: 8, bytesPerRow: 4,
+                                  space: colorSpace,
+                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return 0.5 }
+        ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        let r = CGFloat(pixel[0]) / 255
+        let g = CGFloat(pixel[1]) / 255
+        let b = CGFloat(pixel[2]) / 255
+        // Perceived luminance formula
+        return 0.299 * r + 0.587 * g + 0.114 * b
+    }
+
+    private func startGlowAnimation() {
+        stopGlowAnimation()
+        guard let imageLayer = imageView?.layer else { return }
+        
+        // Choose glow color and direction based on artwork luminance
+        let luminance = artworkLuminance()
+        let glowLayer = CAGradientLayer()
+        glowLayer.frame = imageLayer.bounds
+        glowLayer.cornerRadius = imageLayer.cornerRadius
+        glowLayer.masksToBounds = true
+        glowLayer.zPosition = 1000
+        glowLayer.name = "glowOverlayLayer"
+        glowLayer.type = .radial
+        glowLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
+        glowLayer.opacity = 0
+        
+        // Scale glow opacity with luminance — light art needs stronger glow to be visible
+        let glowOpacity = Float(0.5 + (luminance * 0.5))  // range: 0.5 (dark) to 1.0 (light)
+        let gradientAlpha = 0.9 + (luminance * 0.1)       // range: 0.9 (dark) to 1.0 (light)
+        
+        glowLayer.colors = [
+            NSColor.white.withAlphaComponent(gradientAlpha).cgColor,
+            NSColor.white.withAlphaComponent(0.0).cgColor
+        ]
+        glowLayer.endPoint = CGPoint(x: 0.6, y: 0.6)
+        glowLayer.compositingFilter = "screenBlendMode"
+        imageLayer.addSublayer(glowLayer)
+        
+        let pulse = CABasicAnimation(keyPath: "opacity")
+        pulse.fromValue = 0.0
+        pulse.toValue = glowOpacity
+        pulse.duration = 1.5
+        pulse.autoreverses = true
+        pulse.repeatCount = .infinity
+        pulse.timingFunction = CAMediaTimingFunction(controlPoints: 0.45, 0.0, 0.55, 1.0)
+        glowLayer.add(pulse, forKey: "kGlowAnimationKey")
+        
+        let expand = CABasicAnimation(keyPath: "endPoint")
+        expand.fromValue = CGPoint(x: 0.6, y: 0.6)
+        expand.toValue = CGPoint(x: 1.2, y: 1.2)
+        expand.duration = 1.5
+        expand.autoreverses = true
+        expand.repeatCount = .infinity
+        expand.timingFunction = CAMediaTimingFunction(controlPoints: 0.45, 0.0, 0.55, 1.0)
+        glowLayer.add(expand, forKey: "kGlowExpandKey")
+    }
+    
+    private func stopGlowAnimation() {
+        imageView?.layer?.removeAnimation(forKey: "kDimAnimationKey")
+        imageView?.layer?.opacity = 1.0
+        imageView?.layer?.sublayers?
+            .filter { $0.name == "glowOverlayLayer" }
+            .forEach { $0.removeFromSuperlayer() }
+        imageView?.layer?.superlayer?.sublayers?
+            .filter { $0.name == "glowShadowLayer" }
+            .forEach { $0.removeFromSuperlayer() }
+        imageView?.layer?.superlayer?.superlayer?.sublayers?
+            .filter { $0.name == "glowShadowLayer" }
+            .forEach { $0.removeFromSuperlayer() }
     }
     
     internal func updateUIState(for item: NowPlayingItem?) {
@@ -158,10 +246,16 @@ class NowPlayingItemView: PKDetailView {
     }
     
     private func updateForNowPlayingState() {
-        if Preferences[.animateIconWhilePlaying], self.nowPLayingItem?.isPlaying ?? false {
+        let playing = self.nowPLayingItem?.isPlaying ?? false
+        if Preferences[.animateIconWhilePlaying], playing {
             self.startSmoothBounceAnimation()
         } else {
             self.stopBounceAnimation()
+        }
+        if playing && Preferences[.artworkGlow] {
+            self.startGlowAnimation()
+        } else {
+            self.stopGlowAnimation()
         }
     }
     
@@ -192,6 +286,7 @@ class NowPlayingItemView: PKDetailView {
     override func removeFromSuperview() {
         super.removeFromSuperview()
         self.stopBounceAnimation()
+        self.stopGlowAnimation()
     }
     
     override func viewDidMoveToSuperview() {

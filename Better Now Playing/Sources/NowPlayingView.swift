@@ -69,6 +69,7 @@ class NowPlayingView: PKView {
         NSLog("[NOW_PLAYING]: NowPlayingView - deinit")
         NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeArtworkGlowNotification), object: nil)
         helper = nil
         itemView?.removeFromSuperview()
         itemView = nil
@@ -80,6 +81,7 @@ class NowPlayingView: PKView {
         NSLog("[NOW_PLAYING]: NowPlayingView - register for notifications")
         NotificationCenter.default.addObserver(self, selector: #selector(configureUIElements), name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkSizeChange), name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkGlowChange), name: Notification.Name(didChangeArtworkGlowNotification), object: nil)
     }
     
     convenience init(frame: NSRect, shouldLoadHelper: Bool) {
@@ -106,6 +108,10 @@ class NowPlayingView: PKView {
         itemView?.updateConstraint()
         itemView?.needsLayout = true
         itemView?.layout()
+    }
+    
+    @objc private func handleArtworkGlowChange() {
+        itemView?.updateUIState(for: item)
     }
     
     @objc private func configureUIElements() {
