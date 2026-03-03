@@ -2,7 +2,7 @@
 
 A fixed fork of the [now-playing-widget](https://github.com/pock/now-playing-widget) Pock widget, updated to work on **macOS 15.4 and later**, where Apple privatized direct access to the MediaRemote framework.
 
-![Touch Bar Preview](TouchBar.png)
+![Touch Bar Preview](TouchBar.gif)
 
 ---
 
