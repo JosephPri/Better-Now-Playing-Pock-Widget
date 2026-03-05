@@ -58,7 +58,7 @@ cd build
 cmake ..
 make
 ```
-You can now close Terminal.
+&emsp;&ensp;&ensp;You can now close Terminal.
 
 3. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
 > On first build, Pock may give an error. Simply press **⌘B** again to rebuild and it will work correctly.
