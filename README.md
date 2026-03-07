@@ -70,8 +70,7 @@ make
 
 ## Known Issues (current bugs while in beta, not limitations)
 
-- The widget seems to stop checking for music after an extended period of time (seems to happen when MacBook is closed for a while), I should be able to fix it soon, but for now pock must be reloaded (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**) when this happens.
-- The widget also seems to (sometimes) stop checking for music after a playlist ends, but does seem to fix itself by closing/opening music player or clicking some random combination of media controls. This of course can also be remedied by reloading pock (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**).
+- The widget seems to (sometimes) stop checking for music after a playlist ends, but does seem to fix itself by closing/opening your music player or clicking some random combination of media controls. This of course can also be remedied by reloading pock (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**).
 
 ---
 
