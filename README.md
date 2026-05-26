@@ -65,12 +65,6 @@ make
 4. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
 5. **Add to Touch Bar** - click the Pock icon again and select **Customize Pock...** (`⌘P`), then drag the **Better Now Playing** widget down to the Touch Bar.
    > If nothing happens after clicking **Customize Pock...**, repeat step 5 with the Widget Manager (from step 4) still open.
-   
----
-
-## Known Issues (current bugs while in beta, not limitations)
-
-- The widget seems to (sometimes) stop checking for music after a playlist ends, but does seem to fix itself by closing/opening your music player or clicking some random combination of media controls. This of course can also be remedied by reloading pock (**click Pock menu bar icon** > **Advanced** > **Reload Pock...**).
 
 ---
 
