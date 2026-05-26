@@ -12,8 +12,10 @@
                 <outlet property="artworkGlowCheckbox" destination="V4d-IO-PCr" id="OhI-ZJ-tRe"/>
                 <outlet property="artworkSizeSlider" destination="GPd-g3-A1w" id="MG3-aQ-zAs"/>
                 <outlet property="defaultRadioButton" destination="hjN-rN-Bz7" id="DuT-sv-3ur"/>
+                <outlet property="hideAfterInactivityCheckbox" destination="ina-ct-ch1" id="ina-ct-ch1-out"/>
                 <outlet property="hideWidgetIfNoMedia" destination="o7u-jf-oUS" id="l0H-jI-rKk"/>
                 <outlet property="imagesStackView" destination="6vs-1x-7qT" id="xRb-qe-4M9"/>
+                <outlet property="inactivityTimeoutPopup" destination="ina-pp-001" id="ina-pp-001-out"/>
                 <outlet property="invertSwipeGesture" destination="1oC-rO-r9e" id="KhC-0p-wsb"/>
                 <outlet property="onlyInfoRadioButton" destination="SWC-PR-hvh" id="OBq-Mb-hey"/>
                 <outlet property="playPauseRadioButton" destination="z1t-VA-Pez" id="Pyl-fj-gnH"/>
@@ -248,6 +250,47 @@
                                         <action selector="didChangeCheckboxState:" target="-2" id="KhC-0p-wsb-action"/>
                                     </connections>
                                 </button>
+                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="8" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ina-row-sv">
+                                    <rect key="frame" x="0.0" y="0.0" width="371" height="18"/>
+                                    <subviews>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ina-ct-ch1">
+                                            <rect key="frame" x="0.0" y="1" width="200" height="16"/>
+                                            <buttonCell key="cell" type="check" title="Hide after inactivity:" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ina-ct-ch1-cell">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="didToggleHideAfterInactivity:" target="-2" id="ina-ct-ch1-act"/>
+                                            </connections>
+                                        </button>
+                                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ina-pp-001">
+                                            <rect key="frame" x="208" y="0.0" width="120" height="18"/>
+                                            <popUpButtonCell key="cell" type="push" title="30 seconds" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" arrowPosition="arrowAtBottom" preferredEdge="maxY" id="ina-pp-001-cell">
+                                                <font key="font" metaFont="system"/>
+                                                <menu key="menu" id="ina-menu-001">
+                                                    <items>
+                                                        <menuItem title="10 seconds" id="ina-mi-10"/>
+                                                        <menuItem title="30 seconds" state="on" id="ina-mi-30"/>
+                                                        <menuItem title="1 minute" id="ina-mi-60"/>
+                                                        <menuItem title="2 minutes" id="ina-mi-120"/>
+                                                        <menuItem title="5 minutes" id="ina-mi-300"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="didChangeInactivityTimeout:" target="-2" id="ina-pp-001-act"/>
+                                            </connections>
+                                        </popUpButton>
+                                    </subviews>
+                                    <visibilityPriorities>
+                                        <integer value="1000"/>
+                                        <integer value="1000"/>
+                                    </visibilityPriorities>
+                                    <customSpacing>
+                                        <real value="3.4028234663852886e+38"/>
+                                        <real value="3.4028234663852886e+38"/>
+                                    </customSpacing>
+                                </stackView>
                             </subviews>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -259,8 +302,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
