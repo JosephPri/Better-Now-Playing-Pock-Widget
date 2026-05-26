@@ -41,6 +41,19 @@ class NowPlayingItemView: PKDetailView {
         return max(0, imageSize - 24)
     }
 
+    /// The effective maxWidth to apply, accounting for fixed-width mode.
+    /// In dynamic mode this is 160 + artworkWidthBonus (unchanged behaviour).
+    /// In fixed mode it is the user-entered pixel value + artworkWidthBonus so the
+    /// image size correction in updateConstraint() still works correctly.
+    private var effectiveMaxWidth: CGFloat {
+        if Preferences[.fixedWidthEnabled] {
+            let pixels: Int = Preferences[.fixedWidthPixels]
+            let base = CGFloat(max(40, pixels))  // clamp to a sensible minimum
+            return base + artworkWidthBonus
+        }
+        return 160 + artworkWidthBonus
+    }
+
     override func didLoad() {
         canScrollTitle = true
         canScrollSubtitle = true
@@ -57,6 +70,22 @@ class NowPlayingItemView: PKDetailView {
         
         updateUIState(for: nil)
         super.didLoad()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleFixedWidthChange),
+            name: Notification.Name(didChangeFixedWidthNotification),
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeFixedWidthNotification), object: nil)
+    }
+    
+    @objc private func handleFixedWidthChange() {
+        // Re-apply the current item with the new width setting
+        updateUIState(for: nowPLayingItem)
     }
     
     override func updateConstraint() {
@@ -88,7 +117,16 @@ class NowPlayingItemView: PKDetailView {
         // Correct width constraint — PKDetailView assumes 24pt image, we use actual size
         let actualImagePt = 30 - (inset * 2)
         let correctedWidth = contentWidth - 24 + actualImagePt + contentContainer.spacing
-        let cappedWidth = maxWidth > 0 ? min(correctedWidth, maxWidth) : correctedWidth
+
+        // In fixed-width mode, always use exactly effectiveMaxWidth regardless of
+        // how wide the text content measures — this is what locks the widget size.
+        let cappedWidth: CGFloat
+        if Preferences[.fixedWidthEnabled] {
+            cappedWidth = effectiveMaxWidth
+        } else {
+            cappedWidth = maxWidth > 0 ? min(correctedWidth, maxWidth) : correctedWidth
+        }
+
         if let widthConstraint = container.constraints.first(where: { $0.identifier == "contentContainer.width" }) {
             widthConstraint.constant = cappedWidth
         }
@@ -218,7 +256,7 @@ class NowPlayingItemView: PKDetailView {
         guard let item = self.nowPLayingItem, let client = item.client else {
             let appBundleIdentifier: String = Preferences[.defaultPlayer]
             imageView.image = NSWorkspace.shared.applicationIcon(for: appBundleIdentifier, fallbackFileType: "mp3")
-            maxWidth = 160 + artworkWidthBonus
+            maxWidth = effectiveMaxWidth
             set(title: NSWorkspace.shared.applicationName(for: appBundleIdentifier))
             subtitleView.isHidden = true
             return
@@ -229,7 +267,7 @@ class NowPlayingItemView: PKDetailView {
             imageView.image = client.icon
         }
         // Set maxWidth BEFORE set(title:) so updateConstraint sees the cap in time
-        maxWidth = 160 + artworkWidthBonus
+        maxWidth = effectiveMaxWidth
         
         var title = item.title ?? (item.artist == nil ? client.displayName : "Missing title") ?? "Missing title"
         if title.isEmpty {

@@ -10,6 +10,10 @@
 import Foundation
 import AppKit
 
+extension Notification.Name {
+    static let nowPlayingInactivityDidChange = Notification.Name("NowPlayingInactivityDidChange")
+}
+
 class NowPlayingHelper {
     
     /// Data
@@ -30,6 +34,10 @@ class NowPlayingHelper {
     private var refreshTimer: Timer?
     /// Repeating timer that kills NowPlayingTouchUI if it respawns despite launchctl disable
     private var killTimer: Timer?
+    /// One-shot timer that fires when the user's chosen inactivity period expires
+    private var inactivityTimer: Timer?
+    /// Tracks whether the widget is currently hidden due to inactivity timeout
+    private var isHiddenDueToInactivity: Bool = false
     
     internal init(forView: NowPlayingView) {
         NSLog("[NOW_PLAYING]: NowPlayingHelper - init")
@@ -74,6 +82,7 @@ class NowPlayingHelper {
         
         startPeriodicRefresh()
         startKillTimer()
+        resetInactivityTimer()
     }
     
     private func startPeriodicRefresh() {
@@ -104,6 +113,55 @@ class NowPlayingHelper {
         killTimer?.invalidate()
         killTimer = nil
     }
+    
+    // MARK: - Pause timeout
+    
+    /// Called whenever the play state changes. Starts the countdown when paused,
+    /// cancels it (and unhides) when playback resumes.
+    internal func resetInactivityTimer() {
+        let isPlaying = currentNowPlayingItem?.isPlaying ?? false
+        
+        if isPlaying {
+            // Playback resumed — cancel any running timer and unhide immediately
+            inactivityTimer?.invalidate()
+            inactivityTimer = nil
+            if isHiddenDueToInactivity {
+                isHiddenDueToInactivity = false
+                NotificationCenter.default.post(name: .nowPlayingInactivityDidChange, object: nil)
+            }
+        } else {
+            // Paused (or stopped) — start the countdown if the feature is enabled
+            // and a timer isn't already running
+            guard Preferences[.hideAfterInactivity] else {
+                inactivityTimer?.invalidate()
+                inactivityTimer = nil
+                return
+            }
+            guard inactivityTimer == nil else { return }   // already counting down
+            let timeout: Int = Preferences[.inactivityTimeout]
+            guard timeout > 0 else { return }
+            let timer = Timer(timeInterval: TimeInterval(timeout), repeats: false) { [weak self] _ in
+                self?.handlePauseTimeout()
+            }
+            RunLoop.main.add(timer, forMode: .common)
+            inactivityTimer = timer
+            print("[NowPlayingHelper] Pause timeout started — will hide in \(timeout)s")
+        }
+    }
+    
+    private func handlePauseTimeout() {
+        print("[NowPlayingHelper] Pause timeout fired — hiding widget")
+        isHiddenDueToInactivity = true
+        NotificationCenter.default.post(name: .nowPlayingInactivityDidChange, object: nil)
+    }
+    
+    private func stopInactivityTimer() {
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
+    }
+    
+    /// Whether the widget should currently be suppressed due to a pause timeout.
+    public var shouldHideDueToInactivity: Bool { isHiddenDueToInactivity }
     
     private func periodicRefresh() {
         // Only refresh if we think something is playing
@@ -182,6 +240,7 @@ class NowPlayingHelper {
         // Stop periodic refresh and kill timer
         stopPeriodicRefresh()
         stopKillTimer()
+        stopInactivityTimer()
         
         // Cancel any pending artwork fallback
         artworkFallbackWorkItem?.cancel()
@@ -293,6 +352,9 @@ class NowPlayingHelper {
             } else {
                 self.currentNowPlayingItem?.isPlaying = info.isPlaying
             }
+            
+            // Play/pause counts as activity — reset the inactivity countdown
+            self.resetInactivityTimer()
             
             // ALWAYS update the view
             self.view?.updateContentViews()
@@ -494,16 +556,10 @@ class NowPlayingHelper {
         self.currentNowPlayingItem?.artist = info.artist
         self.currentNowPlayingItem?.isPlaying = info.isPlaying
         
-        // Handle artwork
-        guard Preferences[.showMediaArtwork] else {
-            print("[NowPlayingHelper] updateWithInfo - artwork disabled")
-            artworkFallbackWorkItem?.cancel()
-            artworkFallbackWorkItem = nil
-            self.currentNowPlayingItem?.artwork = nil
-            self.view?.updateContentViews()
-            return
-        }
+        // Re-evaluate pause timeout now that isPlaying is updated
+        resetInactivityTimer()
         
+        // Handle artwork
         if info.hasAdapterArtwork {
             // Adapter has artwork data — decode and use it. Cancel any iTunes fallback.
             // This is always the correct artwork: it comes directly from Apple Music.

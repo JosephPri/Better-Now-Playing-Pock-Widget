@@ -61,7 +61,7 @@ make
 &emsp;&ensp;&ensp;You can now close Terminal.
 
 3. **Install in Pock** - Press **⌘B** in the newly opened Xcode window, Pock installs it automatically
-> On first build, Pock may give an error. Simply press **⌘B** again to rebuild and it will work correctly.
+    > On first build, Pock may give an error. Simply press **⌘B** again to rebuild and it will work correctly.
 4. **Configure the widget** - click the Pock icon in the menu bar, then select **Manage Widgets** (`⌘M`). Here you can choose your preferred widget layout and other settings.
 5. **Add to Touch Bar** - click the Pock icon again and select **Customize Pock...** (`⌘P`), then drag the **Better Now Playing** widget down to the Touch Bar.
    > If nothing happens after clicking **Customize Pock...**, repeat step 5 with the Widget Manager (from step 4) still open.

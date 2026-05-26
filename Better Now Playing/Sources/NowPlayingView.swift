@@ -45,6 +45,8 @@ class NowPlayingView: PKView {
     
     /// Core
     private var shouldHideWidget: Bool {
+        // Inactivity timeout takes priority — always hide when it fires
+        if helper?.shouldHideDueToInactivity == true { return true }
         if Preferences[.hideNowPlayingIfNoMedia] {
             guard let item = item else {
                 return true
@@ -70,6 +72,8 @@ class NowPlayingView: PKView {
         NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeArtworkGlowNotification), object: nil)
+        NotificationCenter.default.removeObserver(self, name: .nowPlayingInactivityDidChange, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(didChangeInactivityTimeoutNotification), object: nil)
         helper = nil
         itemView?.removeFromSuperview()
         itemView = nil
@@ -82,6 +86,8 @@ class NowPlayingView: PKView {
         NotificationCenter.default.addObserver(self, selector: #selector(configureUIElements), name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkSizeChange), name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkGlowChange), name: Notification.Name(didChangeArtworkGlowNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleInactivityChange), name: .nowPlayingInactivityDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleInactivityPreferenceChange), name: Notification.Name(didChangeInactivityTimeoutNotification), object: nil)
     }
     
     convenience init(frame: NSRect, shouldLoadHelper: Bool) {
@@ -112,6 +118,18 @@ class NowPlayingView: PKView {
     
     @objc private func handleArtworkGlowChange() {
         itemView?.updateUIState(for: item)
+    }
+    
+    /// Called when the inactivity timer fires or resets — show or hide the widget accordingly.
+    @objc private func handleInactivityChange() {
+        updateContentViews()
+    }
+    
+    /// Called when the user changes the inactivity preference in the pref pane —
+    /// restart the timer with the new settings (helper handles the logic).
+    @objc private func handleInactivityPreferenceChange() {
+        helper?.resetInactivityTimer()
+        updateContentViews()
     }
     
     @objc private func configureUIElements() {

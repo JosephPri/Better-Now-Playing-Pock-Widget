@@ -10,17 +10,26 @@ import Foundation
 internal let didChangeNowPlayingWidgetStyle = "didChangeNowPlayingWidgetStyle"
 internal let didChangeArtworkSizeNotification = "didChangeArtworkSize"
 internal let didChangeArtworkGlowNotification = "didChangeArtworkGlow"
+internal let didChangeInactivityTimeoutNotification = "didChangeInactivityTimeout"
+internal let didChangeFixedWidthNotification = "didChangeFixedWidth"
 
 internal struct Preferences {
     internal enum Keys: String {
         case nowPlayingWidgetStyle
         case hideNowPlayingIfNoMedia
         case animateIconWhilePlaying
-        case showMediaArtwork
         case invertSwipeGesture
         case defaultPlayer
         case artworkSize
         case artworkGlow
+        /// Whether to hide the widget after a period of inactivity (no playback).
+        case hideAfterInactivity
+        /// Seconds of inactivity before the widget hides. 0 = disabled.
+        case inactivityTimeout
+        /// Whether the widget should use a fixed width instead of resizing with text.
+        case fixedWidthEnabled
+        /// The fixed width size
+        case fixedWidthPixels
     }
     static subscript<T>(_ key: Keys) -> T {
         get {
@@ -29,11 +38,9 @@ internal struct Preferences {
                 case .nowPlayingWidgetStyle:
                     return "onlyInfo" as! T
                 case .hideNowPlayingIfNoMedia:
-                    return false as! T
+                    return true as! T
                 case .animateIconWhilePlaying:
                     return false as! T
-                case .showMediaArtwork:
-                    return true as! T
                 case .invertSwipeGesture:
                     return false as! T
                 case .defaultPlayer:
@@ -45,7 +52,15 @@ internal struct Preferences {
                 case .artworkGlow:
                     return true as! T
                 case .artworkSize:
-                    return 3 as! T
+                    return 0 as! T
+                case .hideAfterInactivity:
+                    return true as! T
+                case .inactivityTimeout:
+                    return 120 as! T
+                case .fixedWidthEnabled:
+                    return false as! T
+                case .fixedWidthPixels:
+                    return 100 as! T
                 }
             }
             return value
@@ -54,14 +69,18 @@ internal struct Preferences {
             UserDefaults.standard.setValue(newValue, forKey: key.rawValue)
         }
     }
+
     static func reset() {
         Preferences[.nowPlayingWidgetStyle] = "onlyInfo"
         Preferences[.hideNowPlayingIfNoMedia] = true
         Preferences[.animateIconWhilePlaying] = false
-        Preferences[.showMediaArtwork] = true
         Preferences[.invertSwipeGesture] = false
         Preferences[.artworkGlow] = true
-        Preferences[.artworkSize] = 1
+        Preferences[.artworkSize] = 0
+        Preferences[.hideAfterInactivity] = true
+        Preferences[.inactivityTimeout] = 120
+        Preferences[.fixedWidthEnabled] = false
+        Preferences[.fixedWidthPixels] = 100
         if #available(OSX 10.15, *) {
             Preferences[.defaultPlayer] = "com.apple.Music"
         } else {
