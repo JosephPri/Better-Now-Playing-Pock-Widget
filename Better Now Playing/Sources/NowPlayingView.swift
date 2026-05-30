@@ -200,14 +200,24 @@ class NowPlayingView: PKView {
     @objc internal func updateContentViews() {
         print("[NowPlayingView] updateContentViews called - shouldHideWidget: \(shouldHideWidget)")
         
-        guard !shouldHideWidget else {
+        if shouldHideWidget {
             print("[NowPlayingView] updateContentViews - hiding widget")
-            removeArrangedSubviews()
+            // Hide subviews rather than destroying them so we don't lose state
+            for view in stackView.arrangedSubviews {
+                view.isHidden = true
+            }
             return
         }
+        
+        // Ensure views exist
         if stackView.arrangedSubviews.isEmpty {
             print("[NowPlayingView] updateContentViews - stackView empty, configuring UI")
             configureUIElements()
+        } else {
+            // Unhide any previously hidden subviews
+            for view in stackView.arrangedSubviews {
+                view.isHidden = false
+            }
         }
         
         print("[NowPlayingView] updateContentViews - style: \(style)")

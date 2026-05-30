@@ -339,10 +339,82 @@ open "Better Now Playing.xcworkspace"
 
 ---
 
+## Widget Update Resilience
+
+During song transitions, the system's MediaRemote framework can briefly send empty or
+incomplete updates (no `bundleIdentifier`, no `title`, `isPlaying = false`). Without
+proper handling, these transient states cause the widget to disappear and fail to
+recover when the new song data arrives.
+
+This is especially common with **non-standard audio sources** like web browsers
+(Chrome, Safari, Firefox, Arc, etc.) that aren't in the traditional "music app" list.
+
+### The Problem
+
+Three layers of code could independently wipe the widget state during transitions:
+
+1. **`MediaRemoteAdapter.handleStreamUpdate`** — Received an "empty full update"
+   and cleared `_currentInfo` to `nil` when the audio source wasn't a hardcoded
+   music app.
+
+2. **`NowPlayingHelper.updateMediaContent`** — When `currentInfo` was `nil`, only
+   preserved existing state if Music/Spotify/iTunes was running. For browsers,
+   it called `updateWithInfo(nil)` which cleared the client.
+
+3. **`NowPlayingView.updateContentViews`** — Called `removeArrangedSubviews()` when
+   `shouldHideWidget` was true, which **destroyed** the `itemView` (set it to `nil`).
+   Recreating it on the next update lost all internal state.
+
+### The Fix
+
+**`MediaRemoteAdapter.swift`** — Empty update protection now checks if we already
+have *any* valid state (`bundleIdentifier` or `title`), regardless of which app
+produced it. Transient empty updates no longer wipe state.
+
+**`NowPlayingHelper.swift`** — Two changes:
+- `updateMediaContent`: If we already have a client set from *any* source (including
+  browsers), we preserve the existing state during `nil` transitions instead of
+  requiring a hardcoded music app to be running.
+- `updateWithInfo(nil)`: Same approach — preserves the existing client rather than
+  replacing it only when a known music app is detected.
+- `periodicRefresh`: Now also runs when `isPlaying` is false but a client is set,
+  covering the brief `isPlaying = false` window during song transitions.
+
+**`NowPlayingView.swift`** — `updateContentViews()` now **hides** subviews
+(via `isHidden = true`) instead of destroying them. This preserves the `itemView`
+reference and its internal state across hide/show cycles. Views are only destroyed
+in `deinit` or when the widget style changes via `configureUIElements()`.
+
+```
+Song Change Timeline (Before Fix):
+────────────────────────────────────────────
+t0: Song A playing          → Widget visible ✓
+t1: Transition (nil update) → Widget destroyed ✗
+t2: Song B arrives          → Widget stays hidden ✗ (itemView was nil)
+
+Song Change Timeline (After Fix):
+────────────────────────────────────────────
+t0: Song A playing          → Widget visible ✓
+t1: Transition (nil update) → State preserved, view hidden ✓
+t2: Song B arrives          → Widget unhidden with new data ✓
+```
+
+---
+
 ## Troubleshooting
 
 **Widget not appearing in Touch Bar:**
 - Make sure Pock is running and the widget is added via Customize Pock
+
+**Widget not updating when changing songs:**
+- This was a known issue where transient empty updates from the MediaRemote framework
+  caused the widget to disappear during song transitions. The fix preserves existing
+  state during these transitions.
+- If you're using a browser as your audio source, make sure you're running the latest
+  version with the widget update resilience fix.
+- Check console logs for `[NowPlayingHelper]` messages — you should see
+  "preserving existing client" or "preserving state during nil transition" during
+  song changes.
 
 **Album art not showing:**
 - Check that the mediaremote-adapter framework was built correctly
