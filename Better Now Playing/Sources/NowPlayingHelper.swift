@@ -70,9 +70,10 @@ class NowPlayingHelper {
         // Start the adapter
         MediaRemoteAdapter.shared.startStreaming()
         
-        // Permanently disable NowPlayingTouchUI via launchctl so it never respawns.
-        // The kill timer is no longer needed after this.
-        suppressNowPlayingTouchUI()
+        // Suppress the native Now Playing Touch Bar if preference is enabled
+        if Preferences[.disableNativeNowPlaying] {
+            suppressNowPlayingTouchUI()
+        }
         
         // Initial UI update - IMPORTANT: Do this before getting adapter state
         view?.updateContentViews()
@@ -81,7 +82,12 @@ class NowPlayingHelper {
         updateFromAdapter()
         
         startPeriodicRefresh()
-        startKillTimer()
+        
+        // Only start kill timer if we're suppressing native Now Playing
+        if Preferences[.disableNativeNowPlaying] {
+            startKillTimer()
+        }
+        
         resetInactivityTimer()
     }
     
@@ -201,6 +207,12 @@ class NowPlayingHelper {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(updateCurrentPlayingState),
                                                name: .mediaRemoteAdapterIsPlayingDidChange,
+                                               object: nil)
+        
+        // Listen for preference changes - native Now Playing
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleDisableNativeNowPlayingChange),
+                                               name: Notification.Name(didChangeDisableNativeNowPlayingNotification),
                                                object: nil)
         
         // ADDED: Listen for app launches/terminations to catch music app restarts
@@ -373,9 +385,11 @@ class NowPlayingHelper {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             guard let self = self else { return }
             
-            // Re-suppress NowPlayingTouchUI on wake — launchd sometimes re-enables
-            // agents during sleep/wake cycles
-            self.suppressNowPlayingTouchUI()
+            // Re-suppress NowPlayingTouchUI on wake if preference is enabled
+            // launchd sometimes re-enables agents during sleep/wake cycles
+            if Preferences[.disableNativeNowPlaying] {
+                self.suppressNowPlayingTouchUI()
+            }
             
             // Restart the stream
             MediaRemoteAdapter.shared.startStreaming()
@@ -399,12 +413,49 @@ class NowPlayingHelper {
         }
     }
     
+    /// Handle changes to the "disable native Now Playing" preference
+    @objc private func handleDisableNativeNowPlayingChange() {
+        let shouldDisable: Bool = Preferences[.disableNativeNowPlaying]
+        print("[NowPlayingHelper] handleDisableNativeNowPlayingChange - shouldDisable: \(shouldDisable)")
+        
+        if shouldDisable {
+            // Enable suppression
+            suppressNowPlayingTouchUI()
+            startKillTimer()
+        } else {
+            // Disable suppression - re-enable the native Now Playing Touch Bar
+            reenableNowPlayingTouchUI()
+            stopKillTimer()
+        }
+    }
+    
+    /// Re-enable the native Now Playing Touch Bar agent via launchctl
+    private func reenableNowPlayingTouchUI() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let enable = Process()
+            enable.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+            enable.arguments = ["enable", "gui/\(getuid())/com.apple.nowplayingtouchui"]
+            try? enable.run()
+            enable.waitUntilExit()
+            
+            // Boot the agent to start it immediately
+            let boot = Process()
+            boot.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+            boot.arguments = ["boot", "gui/\(getuid())/com.apple.nowplayingtouchui"]
+            try? boot.run()
+            boot.waitUntilExit()
+            
+            print("[NowPlayingHelper] NowPlayingTouchUI re-enabled via launchctl")
+        }
+    }
+    
     @objc private func handleAppLaunched(_ notification: Notification) {
         guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
         guard let bundleId = app.bundleIdentifier else { return }
         
         // Belt-and-suspenders: if it somehow launches despite the launchctl disable, kill it
-        if bundleId == "com.apple.NowPlayingTouchUI" || app.localizedName == "NowPlayingTouchUI" {
+        // Only do this if preference is enabled
+        if Preferences[.disableNativeNowPlaying] && (bundleId == "com.apple.NowPlayingTouchUI" || app.localizedName == "NowPlayingTouchUI") {
             print("[NowPlayingHelper] NowPlayingTouchUI launched despite disable - killing and re-suppressing")
             suppressNowPlayingTouchUI()
             return

@@ -32,12 +32,15 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     // Fixed width controls
     @IBOutlet private weak var fixedWidthCheckbox:      NSButton!
     @IBOutlet private weak var fixedWidthPixelField:   NSTextField!
+    // Native Now Playing control
+    @IBOutlet private weak var disableNativeNowPlayingCheckbox: NSButton!
     
     func reset() {
         Preferences.reset()
         NotificationCenter.default.post(name: .mrPlaybackQueueContentItemsChanged, object: nil)
         NotificationCenter.default.post(name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
         NotificationCenter.default.post(name: Notification.Name(didChangeFixedWidthNotification), object: nil)
+        NotificationCenter.default.post(name: Notification.Name(didChangeDisableNativeNowPlayingNotification), object: nil)
     }
     
     override func viewDidLoad() {
@@ -74,6 +77,10 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
         fixedWidthPixelField?.isEnabled  = fixedEnabled
         let storedPixels: Int = Preferences[.fixedWidthPixels]
         fixedWidthPixelField?.stringValue = "\(storedPixels)"
+        
+        // Native Now Playing
+        let disableNative: Bool = Preferences[.disableNativeNowPlaying]
+        disableNativeNowPlayingCheckbox?.state = disableNative ? .on : .off
     }
     
     private func setupImageViewClickGesture() {
@@ -119,6 +126,12 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
             Preferences[.invertSwipeGesture] = button.state == .on
         case 4:
             Preferences[.artworkGlow] = button.state == .on
+        case 5:
+            // Disable native Now Playing Touch Bar
+            let newValue = button.state == .on
+            Preferences[.disableNativeNowPlaying] = newValue
+            // Immediately apply the change
+            NotificationCenter.default.post(name: Notification.Name(didChangeDisableNativeNowPlayingNotification), object: nil)
         default:
             return
         }
