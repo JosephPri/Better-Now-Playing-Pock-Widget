@@ -1,6 +1,6 @@
 //
 //  NowPlayingView.swift
-//  Pock
+//  Better Now Playing
 //
 //  Created by Pierluigi Galdi on 14/12/2019.
 //  Copyright © 2019 Pierluigi Galdi. All rights reserved.
@@ -63,6 +63,7 @@ class NowPlayingView: PKView {
     
     /// Data
     private var helper: NowPlayingHelper?
+    private var updateBanner: UpdateBannerView?
     public var item: NowPlayingItem? {
         return helper?.currentNowPlayingItem
     }
@@ -97,6 +98,12 @@ class NowPlayingView: PKView {
         if shouldLoadHelper {
             helper = NowPlayingHelper(forView: self)
             registerForNotifications()
+        }
+        UpdateChecker.checkForUpdate { [weak self] available, version in
+            guard available, let self = self else { return }
+            let banner = UpdateBannerView(frame: .zero)
+            self.updateBanner = banner
+            self.stackView.addArrangedSubview(banner)
         }
     }
     

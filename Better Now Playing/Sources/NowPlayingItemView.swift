@@ -1,6 +1,6 @@
 //
 //  NowPlayingItemView.swift
-//  Pock
+//  Better Now Playing
 //
 //  Created by Pierluigi Galdi on 17/02/2019.
 //  Copyright © 2019 Pierluigi Galdi. All rights reserved.
