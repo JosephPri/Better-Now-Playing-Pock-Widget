@@ -449,7 +449,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Better Now Playing";
 				INFOPLIST_KEY_NSPrincipalClass = Better_Now_Playing.NowPlayingWidget;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Application\\ Support/Pock/Widgets";
-				MARKETING_VERSION = 1.04;
+				MARKETING_VERSION = 1.05;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.JosephPri.Better-Now-Playing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -476,7 +476,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Better Now Playing";
 				INFOPLIST_KEY_NSPrincipalClass = Better_Now_Playing.NowPlayingWidget;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Application\\ Support/Pock/Widgets";
-				MARKETING_VERSION = 1.04;
+				MARKETING_VERSION = 1.05;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.JosephPri.Better-Now-Playing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
