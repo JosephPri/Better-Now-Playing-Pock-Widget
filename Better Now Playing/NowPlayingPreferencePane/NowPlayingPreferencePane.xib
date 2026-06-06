@@ -12,6 +12,7 @@
                 <outlet property="artworkGlowCheckbox" destination="V4d-IO-PCr" id="OhI-ZJ-tRe"/>
                 <outlet property="artworkSizeSlider" destination="GPd-g3-A1w" id="MG3-aQ-zAs"/>
                 <outlet property="defaultRadioButton" destination="hjN-rN-Bz7" id="DuT-sv-3ur"/>
+                <outlet property="disableNativeNowPlayingCheckbox" destination="nat-np-001" id="nat-np-001-out"/>
                 <outlet property="fixedWidthCheckbox" destination="fxw-cb-001" id="fxw-cb-001-out"/>
                 <outlet property="fixedWidthPixelField" destination="fxw-tf-001" id="fxw-tf-001-out"/>
                 <outlet property="hideAfterInactivityCheckbox" destination="ina-ct-ch1" id="ina-ct-ch1-out"/>
@@ -19,7 +20,6 @@
                 <outlet property="imagesStackView" destination="6vs-1x-7qT" id="xRb-qe-4M9"/>
                 <outlet property="inactivityTimeoutPopup" destination="ina-pp-001" id="ina-pp-001-out"/>
                 <outlet property="invertSwipeGesture" destination="1oC-rO-r9e" id="KhC-0p-wsb"/>
-                <outlet property="disableNativeNowPlayingCheckbox" destination="nat-np-001" id="nat-np-001-out"/>
                 <outlet property="onlyInfoRadioButton" destination="SWC-PR-hvh" id="OBq-Mb-hey"/>
                 <outlet property="playPauseRadioButton" destination="z1t-VA-Pez" id="Pyl-fj-gnH"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
@@ -28,14 +28,14 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="584" height="616"/>
+            <rect key="frame" x="0.0" y="0.0" width="584" height="599"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="18" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XnL-G6-kic">
-                    <rect key="frame" x="20" y="20" width="544" height="576"/>
+                    <rect key="frame" x="20" y="20" width="544" height="559"/>
                     <subviews>
                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lc0-ND-UTy">
-                            <rect key="frame" x="-2" y="522" width="87" height="16"/>
+                            <rect key="frame" x="-2" y="543" width="87" height="16"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Choose style:" id="ooI-7i-Wfp">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -43,7 +43,7 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vs-1x-7qT">
-                            <rect key="frame" x="0.0" y="404" width="544" height="100"/>
+                            <rect key="frame" x="0.0" y="425" width="544" height="100"/>
                             <subviews>
                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lVi-bn-Iha">
                                     <rect key="frame" x="-3" y="-3" width="174" height="106"/>
@@ -91,7 +91,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="169" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M9l-1b-aku">
-                            <rect key="frame" x="73" y="370" width="398" height="16"/>
+                            <rect key="frame" x="73" y="391" width="398" height="16"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hjN-rN-Bz7">
                                     <rect key="frame" x="0.0" y="0.0" width="22" height="16"/>
@@ -136,10 +136,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView wantsLayer="YES" distribution="fill" orientation="vertical" alignment="leading" spacing="15" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="II5-0Z-P7k">
-                            <rect key="frame" x="0.0" y="0.0" width="371" height="390"/>
+                            <rect key="frame" x="0.0" y="0.0" width="463" height="373"/>
                             <subviews>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UTf-kt-Dtb" userLabel="Choose album art size:">
-                                    <rect key="frame" x="-2" y="336" width="143" height="16"/>
+                                    <rect key="frame" x="-2" y="357" width="143" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Choose album art size:" id="uNn-Ln-Bq5">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -147,7 +147,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aLP-Ia-hyq">
-                                    <rect key="frame" x="0.0" y="305" width="134" height="16"/>
+                                    <rect key="frame" x="0.0" y="326" width="134" height="16"/>
                                     <subviews>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="csb-1w-dM1" userLabel="Choose album art size:">
                                             <rect key="frame" x="-2" y="0.0" width="37" height="16"/>
@@ -187,7 +187,7 @@
                                     </customSpacing>
                                 </stackView>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XSw-wl-Lz7">
-                                    <rect key="frame" x="-2" y="274" width="124" height="16"/>
+                                    <rect key="frame" x="-2" y="295" width="124" height="16"/>
                                     <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Choose animations:" id="9XK-Yd-J8l">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -195,7 +195,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button tag="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VA9-bL-MAf">
-                                    <rect key="frame" x="0.0" y="243" width="210" height="16"/>
+                                    <rect key="frame" x="0.0" y="264" width="210" height="16"/>
                                     <buttonCell key="cell" type="check" title="Animate icon size while playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="4Dg-PS-L8w">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -205,7 +205,7 @@
                                     </connections>
                                 </button>
                                 <button tag="4" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="V4d-IO-PCr">
-                                    <rect key="frame" x="0.0" y="212" width="186" height="16"/>
+                                    <rect key="frame" x="0.0" y="233" width="186" height="16"/>
                                     <buttonCell key="cell" type="check" title="Animate glow while playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="EcV-hw-vXl">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -215,7 +215,7 @@
                                     </connections>
                                 </button>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="m01-jP-Q17">
-                                    <rect key="frame" x="-2" y="181" width="136" height="16"/>
+                                    <rect key="frame" x="-2" y="202" width="136" height="16"/>
                                     <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Choose hide settings:" id="i3X-om-E4W">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -223,7 +223,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="o7u-jf-oUS">
-                                    <rect key="frame" x="0.0" y="150" width="181" height="16"/>
+                                    <rect key="frame" x="0.0" y="171" width="181" height="16"/>
                                     <buttonCell key="cell" type="check" title="Hide while no item playing" bezelStyle="regularSquare" imagePosition="left" inset="2" id="krA-nL-skn">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -232,11 +232,21 @@
                                         <action selector="didChangeCheckboxState:" target="-2" id="Fp2-R4-Oh4"/>
                                     </connections>
                                 </button>
-                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ina-row-sv">
-                                    <rect key="frame" x="0.0" y="101" width="319" height="34"/>
+                                <button tag="5" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nat-np-001">
+                                    <rect key="frame" x="0.0" y="140" width="463" height="16"/>
+                                    <buttonCell key="cell" type="check" title="Hide the native MacOS now playing widget (looks like bar graph in circle)" bezelStyle="regularSquare" imagePosition="left" inset="2" id="nat-np-001-cell">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="didChangeCheckboxState:" target="-2" id="nat-np-001-act"/>
+                                    </connections>
+                                </button>
+                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ina-row-sv">
+                                    <rect key="frame" x="0.0" y="101" width="319" height="24"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ina-ct-ch1">
-                                            <rect key="frame" x="0.0" y="9" width="192" height="16"/>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ina-ct-ch1">
+                                            <rect key="frame" x="0.0" y="4" width="192" height="16"/>
                                             <buttonCell key="cell" type="check" title="Hide after being paused for:" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ina-ct-ch1-cell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -245,8 +255,8 @@
                                                 <action selector="didToggleHideAfterInactivity:" target="-2" id="ina-ct-ch1-act"/>
                                             </connections>
                                         </button>
-                                        <popUpButton verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ina-pp-001">
-                                            <rect key="frame" x="200" y="5" width="119" height="24"/>
+                                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ina-pp-001">
+                                            <rect key="frame" x="200" y="0.0" width="119" height="24"/>
                                             <popUpButtonCell key="cell" type="push" title="10 seconds" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" preferredEdge="maxY" selectedItem="ina-mi-10" id="ina-pp-001-cell">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="message"/>
@@ -275,7 +285,7 @@
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
-                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8eF-Oh-FZC">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8eF-Oh-FZC">
                                     <rect key="frame" x="-2" y="70" width="142" height="16"/>
                                     <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Choose other settings:" id="0xa-RU-TrT">
                                         <font key="font" metaFont="system"/>
@@ -283,7 +293,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button tag="3" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1oC-rO-r9e">
+                                <button tag="3" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1oC-rO-r9e">
                                     <rect key="frame" x="0.0" y="39" width="371" height="16"/>
                                     <buttonCell key="cell" type="check" title="Invert swipe gesture (disable to swipe in direction of skip)" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Uhv-Bg-PsA">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -293,20 +303,10 @@
                                         <action selector="didChangeCheckboxState:" target="-2" id="KhC-0p-wsb-action"/>
                                     </connections>
                                 </button>
-                                <button tag="5" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nat-np-001">
-                                    <rect key="frame" x="0.0" y="10" width="371" height="16"/>
-                                    <buttonCell key="cell" type="check" title="Hide native Touch Bar (show only this widget)" bezelStyle="regularSquare" imagePosition="left" inset="2" id="nat-np-001-cell">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="didChangeCheckboxState:" target="-2" id="nat-np-001-act"/>
-                                    </connections>
-                                </button>
-                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fxw-rw-sv1">
+                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fxw-rw-sv1">
                                     <rect key="frame" x="0.0" y="0.0" width="207" height="24"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fxw-cb-001">
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fxw-cb-001">
                                             <rect key="frame" x="0.0" y="4" width="145" height="16"/>
                                             <buttonCell key="cell" type="check" title="Fixed widget length:" bezelStyle="regularSquare" imagePosition="left" inset="2" id="fxw-cb-001-cell">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -316,7 +316,7 @@
                                                 <action selector="didToggleFixedWidth:" target="-2" id="fxw-cb-001-act"/>
                                             </connections>
                                         </button>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fxw-tf-001">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fxw-tf-001">
                                             <rect key="frame" x="157" y="0.0" width="50" height="24"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="50" id="fxw-tf-001-w"/>
@@ -353,8 +353,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -394,7 +396,7 @@
                 <constraint firstAttribute="trailing" secondItem="XnL-G6-kic" secondAttribute="trailing" constant="20" id="Uuf-us-G5W"/>
                 <constraint firstItem="XnL-G6-kic" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="uNb-YJ-LRJ"/>
             </constraints>
-            <point key="canvasLocation" x="23" y="219"/>
+            <point key="canvasLocation" x="23" y="190.5"/>
         </customView>
     </objects>
     <resources>
