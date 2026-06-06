@@ -213,14 +213,11 @@ class MediaRemoteAdapter {
             
             // Clear state if empty full update (app closed)
             if !isDiff && newInfo?.bundleIdentifier == nil && newInfo?.title == nil {
-                // Only clear if Music isn't actually running - empty update can be a false alarm
-                let musicApps = ["com.apple.Music", "com.spotify.client", "com.apple.iTunes"]
-                let musicIsRunning = NSWorkspace.shared.runningApplications.contains(where: {
-                    musicApps.contains($0.bundleIdentifier ?? "")
-                })
-                
-                if musicIsRunning && self._currentInfo?.bundleIdentifier != nil {
-                    print("[MediaRemoteAdapter] Empty update but Music is running - ignoring to preserve state")
+                // If we already have valid state (from any source — Music, Spotify,
+                // browser, etc.), don't clear it on transient empty updates.
+                // These are common during song transitions and don't mean playback stopped.
+                if self._currentInfo?.bundleIdentifier != nil || self._currentInfo?.title != nil {
+                    print("[MediaRemoteAdapter] Empty update but have existing state - ignoring to preserve")
                     return
                 }
                 

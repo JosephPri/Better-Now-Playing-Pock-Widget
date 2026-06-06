@@ -70,9 +70,10 @@ class NowPlayingHelper {
         // Start the adapter
         MediaRemoteAdapter.shared.startStreaming()
         
-        // Permanently disable NowPlayingTouchUI via launchctl so it never respawns.
-        // The kill timer is no longer needed after this.
-        suppressNowPlayingTouchUI()
+        // Suppress the native Now Playing Touch Bar if preference is enabled
+        if Preferences[.disableNativeNowPlaying] {
+            suppressNowPlayingTouchUI()
+        }
         
         // Initial UI update - IMPORTANT: Do this before getting adapter state
         view?.updateContentViews()
@@ -81,7 +82,12 @@ class NowPlayingHelper {
         updateFromAdapter()
         
         startPeriodicRefresh()
-        startKillTimer()
+        
+        // Only start kill timer if we're suppressing native Now Playing
+        if Preferences[.disableNativeNowPlaying] {
+            startKillTimer()
+        }
+        
         resetInactivityTimer()
     }
     
@@ -164,8 +170,10 @@ class NowPlayingHelper {
     public var shouldHideDueToInactivity: Bool { isHiddenDueToInactivity }
     
     private func periodicRefresh() {
-        // Only refresh if we think something is playing
-        guard let currentItem = currentNowPlayingItem, currentItem.isPlaying else { return }
+        // Refresh if something is playing OR if we have a client set
+        // (covers transitions where isPlaying is briefly false)
+        guard let currentItem = currentNowPlayingItem,
+              currentItem.isPlaying || currentItem.client != nil else { return }
         
         // Get fresh state
         MediaRemoteAdapter.shared.getNowPlayingInfo { [weak self] info in
@@ -201,6 +209,12 @@ class NowPlayingHelper {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(updateCurrentPlayingState),
                                                name: .mediaRemoteAdapterIsPlayingDidChange,
+                                               object: nil)
+        
+        // Listen for preference changes - native Now Playing
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleDisableNativeNowPlayingChange),
+                                               name: Notification.Name(didChangeDisableNativeNowPlayingNotification),
                                                object: nil)
         
         // ADDED: Listen for app launches/terminations to catch music app restarts
@@ -298,27 +312,28 @@ class NowPlayingHelper {
             guard let info = MediaRemoteAdapter.shared.currentInfo else {
                 print("[NowPlayingHelper] updateMediaContent - no info from adapter")
                 
-                // If Music is running, preserve existing state so the widget stays visible
-                let musicApps = ["com.apple.Music", "com.spotify.client", "com.apple.iTunes"]
-                let musicIsRunning = NSWorkspace.shared.runningApplications.contains(where: {
-                    musicApps.contains($0.bundleIdentifier ?? "")
-                })
+                // If we already have a client set (from any source — Music, Spotify,
+                // browser, etc.), preserve the existing state. Transient nil updates
+                // during song changes should not wipe the widget.
+                if self.currentNowPlayingItem?.client != nil {
+                    print("[NowPlayingHelper] Existing client present - preserving state during nil transition")
+                    return
+                }
                 
-                if musicIsRunning {
-                    print("[NowPlayingHelper] Music is running - preserving existing state")
-                    if self.currentNowPlayingItem?.client == nil {
-                        let runningApp = NSWorkspace.shared.runningApplications.first(where: { musicApps.contains($0.bundleIdentifier ?? "") })
-                        if let bundleId = runningApp?.bundleIdentifier {
-                            let displayName = NSWorkspace.shared.applicationName(for: bundleId)
-                            let icon = NSWorkspace.shared.applicationIcon(for: bundleId, fallbackFileType: "mp3")
-                            self.currentNowPlayingItem?.client = NowPlayingItem.Client(
-                                bundleIdentifier: bundleId,
-                                parentApplicationBundleIdentifier: nil,
-                                displayName: displayName,
-                                icon: icon
-                            )
-                        }
-                    }
+                // No existing client — check if a known media app is running
+                // and set it as the default so the widget stays visible.
+                let mediaApps = ["com.apple.Music", "com.spotify.client", "com.apple.iTunes"]
+                if let runningApp = NSWorkspace.shared.runningApplications.first(where: { mediaApps.contains($0.bundleIdentifier ?? "") }),
+                   let bundleId = runningApp.bundleIdentifier {
+                    print("[NowPlayingHelper] Media app running (\(bundleId)) - setting as client")
+                    let displayName = NSWorkspace.shared.applicationName(for: bundleId)
+                    let icon = NSWorkspace.shared.applicationIcon(for: bundleId, fallbackFileType: "mp3")
+                    self.currentNowPlayingItem?.client = NowPlayingItem.Client(
+                        bundleIdentifier: bundleId,
+                        parentApplicationBundleIdentifier: nil,
+                        displayName: displayName,
+                        icon: icon
+                    )
                 } else {
                     self.updateWithInfo(nil)
                 }
@@ -373,9 +388,11 @@ class NowPlayingHelper {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             guard let self = self else { return }
             
-            // Re-suppress NowPlayingTouchUI on wake — launchd sometimes re-enables
-            // agents during sleep/wake cycles
-            self.suppressNowPlayingTouchUI()
+            // Re-suppress NowPlayingTouchUI on wake if preference is enabled
+            // launchd sometimes re-enables agents during sleep/wake cycles
+            if Preferences[.disableNativeNowPlaying] {
+                self.suppressNowPlayingTouchUI()
+            }
             
             // Restart the stream
             MediaRemoteAdapter.shared.startStreaming()
@@ -399,12 +416,49 @@ class NowPlayingHelper {
         }
     }
     
+    /// Handle changes to the "disable native Now Playing" preference
+    @objc private func handleDisableNativeNowPlayingChange() {
+        let shouldDisable: Bool = Preferences[.disableNativeNowPlaying]
+        print("[NowPlayingHelper] handleDisableNativeNowPlayingChange - shouldDisable: \(shouldDisable)")
+        
+        if shouldDisable {
+            // Enable suppression
+            suppressNowPlayingTouchUI()
+            startKillTimer()
+        } else {
+            // Disable suppression - re-enable the native Now Playing Touch Bar
+            reenableNowPlayingTouchUI()
+            stopKillTimer()
+        }
+    }
+    
+    /// Re-enable the native Now Playing Touch Bar agent via launchctl
+    private func reenableNowPlayingTouchUI() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let enable = Process()
+            enable.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+            enable.arguments = ["enable", "gui/\(getuid())/com.apple.nowplayingtouchui"]
+            try? enable.run()
+            enable.waitUntilExit()
+            
+            // Boot the agent to start it immediately
+            let boot = Process()
+            boot.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+            boot.arguments = ["boot", "gui/\(getuid())/com.apple.nowplayingtouchui"]
+            try? boot.run()
+            boot.waitUntilExit()
+            
+            print("[NowPlayingHelper] NowPlayingTouchUI re-enabled via launchctl")
+        }
+    }
+    
     @objc private func handleAppLaunched(_ notification: Notification) {
         guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
         guard let bundleId = app.bundleIdentifier else { return }
         
         // Belt-and-suspenders: if it somehow launches despite the launchctl disable, kill it
-        if bundleId == "com.apple.NowPlayingTouchUI" || app.localizedName == "NowPlayingTouchUI" {
+        // Only do this if preference is enabled
+        if Preferences[.disableNativeNowPlaying] && (bundleId == "com.apple.NowPlayingTouchUI" || app.localizedName == "NowPlayingTouchUI") {
             print("[NowPlayingHelper] NowPlayingTouchUI launched despite disable - killing and re-suppressing")
             suppressNowPlayingTouchUI()
             return
@@ -512,21 +566,27 @@ class NowPlayingHelper {
             self.currentNowPlayingItem?.artwork = nil
             self.currentNowPlayingItem?.isPlaying = false
             
-            // Keep widget visible if Music is actually running
-            let musicApps = ["com.apple.Music", "com.spotify.client", "com.apple.iTunes"]
-            let runningMusicApp = NSWorkspace.shared.runningApplications.first(where: {
-                musicApps.contains($0.bundleIdentifier ?? "")
-            })
-            if let runningApp = runningMusicApp, let bundleId = runningApp.bundleIdentifier {
-                print("[NowPlayingHelper] updateWithInfo - Music running (\(bundleId)), keeping widget visible")
-                let displayName = NSWorkspace.shared.applicationName(for: bundleId)
-                let icon = NSWorkspace.shared.applicationIcon(for: bundleId, fallbackFileType: "mp3")
-                self.currentNowPlayingItem?.client = NowPlayingItem.Client(
-                    bundleIdentifier: bundleId,
-                    parentApplicationBundleIdentifier: nil,
-                    displayName: displayName,
-                    icon: icon
-                )
+            // If we already have a client from any source, preserve it.
+            // The client will be cleared explicitly when the app terminates
+            // (handleAppTerminated) or when a new app takes over.
+            if self.currentNowPlayingItem?.client != nil {
+                print("[NowPlayingHelper] updateWithInfo - preserving existing client")
+            } else {
+                // No existing client — check if a known media app is running
+                let mediaApps = ["com.apple.Music", "com.spotify.client", "com.apple.iTunes"]
+                if let runningApp = NSWorkspace.shared.runningApplications.first(where: {
+                    mediaApps.contains($0.bundleIdentifier ?? "")
+                }), let bundleId = runningApp.bundleIdentifier {
+                    print("[NowPlayingHelper] updateWithInfo - Media app running (\(bundleId)), keeping widget visible")
+                    let displayName = NSWorkspace.shared.applicationName(for: bundleId)
+                    let icon = NSWorkspace.shared.applicationIcon(for: bundleId, fallbackFileType: "mp3")
+                    self.currentNowPlayingItem?.client = NowPlayingItem.Client(
+                        bundleIdentifier: bundleId,
+                        parentApplicationBundleIdentifier: nil,
+                        displayName: displayName,
+                        icon: icon
+                    )
+                }
             }
             
             self.view?.updateContentViews()

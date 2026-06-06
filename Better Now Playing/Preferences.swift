@@ -12,6 +12,7 @@ internal let didChangeArtworkSizeNotification = "didChangeArtworkSize"
 internal let didChangeArtworkGlowNotification = "didChangeArtworkGlow"
 internal let didChangeInactivityTimeoutNotification = "didChangeInactivityTimeout"
 internal let didChangeFixedWidthNotification = "didChangeFixedWidth"
+internal let didChangeDisableNativeNowPlayingNotification = "didChangeDisableNativeNowPlaying"
 
 internal struct Preferences {
     internal enum Keys: String {
@@ -30,6 +31,8 @@ internal struct Preferences {
         case fixedWidthEnabled
         /// The fixed width size
         case fixedWidthPixels
+        /// Whether to suppress the native macOS Now Playing Touch Bar (show only our widget)
+        case disableNativeNowPlaying
     }
     static subscript<T>(_ key: Keys) -> T {
         get {
@@ -61,6 +64,8 @@ internal struct Preferences {
                     return false as! T
                 case .fixedWidthPixels:
                     return 100 as! T
+                case .disableNativeNowPlaying:
+                    return true as! T
                 }
             }
             return value
@@ -81,6 +86,7 @@ internal struct Preferences {
         Preferences[.inactivityTimeout] = 120
         Preferences[.fixedWidthEnabled] = false
         Preferences[.fixedWidthPixels] = 100
+        Preferences[.disableNativeNowPlaying] = true
         if #available(OSX 10.15, *) {
             Preferences[.defaultPlayer] = "com.apple.Music"
         } else {
