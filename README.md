@@ -74,6 +74,7 @@ make
 - [SgtSalmon/Kill-NowPlayingTouchUI](https://github.com/SgtSalmon/Kill-NowPlayingTouchUI/blob/main/LICENSE) - figured out how to kill the annoying and redundant built-in macOS Now Playing icon
 - [pock/now-playing-widget](https://github.com/pock/now-playing-widget) - the original widget this is based on
 - [musa11971](https://gist.github.com/musa11971/62abcfda9ce3bb17f54301fdc84d8323) - iTunes API fallback for album artwork
+- [kalech7](https://github.com/JosephPri/Better-Now-Playing-Pock-Widget/pull/2) - Optimized the underlying media remote adapter functionality, and added the option to re-enable the native now playing widget if desired
 
 ---
 
