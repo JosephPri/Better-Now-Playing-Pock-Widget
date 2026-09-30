@@ -34,13 +34,82 @@ class NowPlayingHelper {
     private var refreshTimer: Timer?
     /// Repeating timer that kills NowPlayingTouchUI if it respawns despite launchctl disable
     private var killTimer: Timer?
-    /// One-shot timer that fires when the user's chosen inactivity period expires
-    private var inactivityTimer: Timer?
+    /// Repeating (1s) timer that drives the pause-inactivity countdown while paused.
+    /// Repeats rather than a single one-shot fire so it can be checked against
+    /// wall-clock time instead of relying on a fire date that misbehaves across
+    /// sleep.
+    private var inactivityTicker: Timer?
+    /// Wall-clock timestamp of when playback most recently transitioned to paused/stopped.
+    /// nil when nothing is playing... er, when not currently counting down.
+    private var pausedSince: Date?
+    /// The isPlaying value we last actually reacted to. Used to ignore redundant
+    /// calls to resetInactivityTimer() that don't represent a real play-state
+    /// transition (several call sites invoke it defensively on every notification,
+    /// periodic refresh tick, etc.) — without this, a flurry of no-op calls could
+    /// restart the countdown from scratch indefinitely and the widget would never hide.
+    private var lastKnownIsPlaying: Bool?
+    /// Bundle identifier of the app we last evaluated the countdown for. Used to
+    /// detect when the "now playing" source itself changes — e.g. Spotify quits
+    /// and the adapter falls back to Apple Music, which might have already been
+    /// sitting paused for ages. That's not a "just paused" moment, so it shouldn't
+    /// be granted a fresh full countdown (see resetInactivityTimer).
+    private var lastKnownClientBundleIdentifier: String?
     /// Tracks whether the widget is currently hidden due to inactivity timeout
     private var isHiddenDueToInactivity: Bool = false
     
+    // MARK: Instance bookkeeping / wake settling
+    
+    /// Pock can build a second NowPlayingWidget (and so a second helper) around a
+    /// sleep/wake cycle, with the old one released only afterwards. These let
+    /// instances tell each other apart in the logs and let the last one out —
+    /// not the first — shut the shared adapter stream down.
+    private static var nextInstanceId = 0
+    private static var liveInstanceCount = 0
+    private let instanceId: Int
+    /// How long after a wake a "playing" report is treated as unconfirmed while
+    /// a pause episode is on record (see `shouldDistrustPlayingReport`).
+    private static let wakeSettleSeconds: TimeInterval = 10
+    private var lastWakeHandled: Date?
+    /// When the user last pressed play/pause/skip on this widget. Their own
+    /// action is never treated as an unconfirmed report.
+    private var lastUserToggle: Date?
+    private var wakeReconcileWorkItem: DispatchWorkItem?
+    
+    private func dbg(_ message: String) {
+        print("[NowPlayingHelper#\(instanceId)] \(message)")
+    }
+    
+    /// When the current pause "episode" began, stored in UserDefaults rather than
+    /// only in this instance. All the other countdown state above lives on the
+    /// helper, so if the helper is ever rebuilt (Pock re-creating the widget when
+    /// the Touch Bar comes back after sleep, the app relaunching, etc.) the record
+    /// of "this has been paused since X" used to vanish, and the fresh helper
+    /// treated the already-paused track as if it had just been paused — showing
+    /// the widget again for a whole new timeout. Cleared only when playback
+    /// genuinely resumes or the feature is turned off.
+    private static let pausedSinceDefaultsKey = "inactivityPausedSinceTimestamp"
+    private var persistedPausedSince: Date? {
+        get {
+            let t = UserDefaults.standard.double(forKey: NowPlayingHelper.pausedSinceDefaultsKey)
+            guard t > 0 else { return nil }
+            let date = Date(timeIntervalSince1970: t)
+            // A timestamp in the future (clock was changed) is meaningless — ignore it.
+            return date <= Date() ? date : nil
+        }
+        set {
+            if let date = newValue {
+                UserDefaults.standard.set(date.timeIntervalSince1970, forKey: NowPlayingHelper.pausedSinceDefaultsKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: NowPlayingHelper.pausedSinceDefaultsKey)
+            }
+        }
+    }
+    
     internal init(forView: NowPlayingView) {
-        NSLog("[NOW_PLAYING]: NowPlayingHelper - init")
+        NowPlayingHelper.nextInstanceId += 1
+        instanceId = NowPlayingHelper.nextInstanceId
+        NowPlayingHelper.liveInstanceCount += 1
+        NSLog("[NOW_PLAYING]: NowPlayingHelper#\(instanceId) - init (live helpers: \(NowPlayingHelper.liveInstanceCount))")
         if let _: String = Preferences[.defaultPlayer] {
             // nothing to do here
         } else {
@@ -122,48 +191,213 @@ class NowPlayingHelper {
     
     // MARK: - Pause timeout
     
-    /// Called whenever the play state changes. Starts the countdown when paused,
-    /// cancels it (and unhides) when playback resumes.
-    internal func resetInactivityTimer() {
-        let isPlaying = currentNowPlayingItem?.isPlaying ?? false
+    /// Called whenever the play state changes (or a preference affecting the
+    /// feature changes). Starts the countdown when paused, cancels it (and
+    /// unhides) when playback resumes.
+    ///
+    /// - Parameter forceReevaluate: pass `true` when the caller isn't reporting
+    ///   a play-state transition but wants the countdown re-evaluated anyway —
+    ///   e.g. the user just toggled the feature on/off or changed the timeout
+    ///   in preferences. Normal callers (play-state notifications) should leave
+    ///   this `false` so redundant calls are ignored instead of restarting the
+    ///   countdown from scratch every time.
+    internal func resetInactivityTimer(forceReevaluate: Bool = false) {
+        var isPlaying = currentNowPlayingItem?.isPlaying ?? false
+        
+        // Right after a wake, MediaRemote can briefly report stale/transient state
+        // (a paused player looking "playing"). If we honoured that, the resume
+        // branch below would clear the pause episode and unhide the widget, and
+        // the following "paused" report would then start a brand-new countdown.
+        // While a pause episode is on record, treat such a report as still
+        // paused; scheduleWakeReconcile() re-checks the real state afterwards.
+        if isPlaying && !forceReevaluate && shouldDistrustPlayingReport() {
+            dbg("Ignoring 'playing' report inside the post-wake settle window (pause episode on record) — treating as still paused")
+            isPlaying = false
+            scheduleWakeReconcile()
+        }
+        
+        // Identify the current source the same way updateWithInfo does, so we
+        // can tell "the currently-shown track just paused" apart from "we just
+        // switched to showing a *different*, already-paused track/app".
+        let clientBundleId = currentNowPlayingItem?.client?.parentApplicationBundleIdentifier
+            ?? currentNowPlayingItem?.client?.bundleIdentifier
+        let previousClientBundleId = lastKnownClientBundleIdentifier
+        // Only counts as a genuine "switch" once we've actually tracked a prior
+        // client — otherwise the very first evaluation at launch would always
+        // look like a "switch" and skip straight to hiding.
+        let clientChanged = previousClientBundleId != nil && clientBundleId != previousClientBundleId
+        lastKnownClientBundleIdentifier = clientBundleId
+        
+        // Edge-detect: ignore calls that don't represent an actual play-state
+        // change. This is the fix for "sometimes it just keeps showing" —
+        // several notifications (periodic refresh, isPlaying-did-change, etc.)
+        // used to call this unconditionally, and if the adapter ever reported
+        // a spurious/incomplete isPlaying blip, the countdown got wiped and
+        // restarted from the full timeout, over and over.
+        if !forceReevaluate {
+            guard lastKnownIsPlaying != isPlaying || clientChanged else { return }
+        }
+        let previousIsPlaying = lastKnownIsPlaying
+        lastKnownIsPlaying = isPlaying
         
         if isPlaying {
-            // Playback resumed — cancel any running timer and unhide immediately
-            inactivityTimer?.invalidate()
-            inactivityTimer = nil
+            // Playback resumed — cancel any running countdown and unhide immediately
+            dbg("Playback resumed — clearing pause episode (was hidden: \(isHiddenDueToInactivity))")
+            stopInactivityCountdown()  // also forgets the persisted pause start
             if isHiddenDueToInactivity {
                 isHiddenDueToInactivity = false
-                NotificationCenter.default.post(name: .nowPlayingInactivityDidChange, object: nil)
+                NotificationCenter.default.post(name: .nowPlayingInactivityDidChange, object: self)
             }
         } else {
-            // Paused (or stopped) — start the countdown if the feature is enabled
-            // and a timer isn't already running
+            // Paused (or stopped) — (re)start the countdown if the feature is enabled
             guard Preferences[.hideAfterInactivity] else {
-                inactivityTimer?.invalidate()
-                inactivityTimer = nil
+                stopInactivityCountdown()
                 return
             }
-            guard inactivityTimer == nil else { return }   // already counting down
             let timeout: Int = Preferences[.inactivityTimeout]
-            guard timeout > 0 else { return }
-            let timer = Timer(timeInterval: TimeInterval(timeout), repeats: false) { [weak self] _ in
-                self?.handlePauseTimeout()
+            guard timeout > 0 else {
+                stopInactivityCountdown()
+                return
             }
-            RunLoop.main.add(timer, forMode: .common)
-            inactivityTimer = timer
-            print("[NowPlayingHelper] Pause timeout started — will hide in \(timeout)s")
+            
+            if clientChanged && !forceReevaluate {
+                // We're now showing a different app/track than before, and it's
+                // already paused — e.g. Spotify quit and the adapter fell back to
+                // Apple Music's stale paused session. We have no way of knowing
+                // how long *that* has actually been sitting paused for, so it
+                // isn't fair to grant it a brand new full timeout as if it had
+                // just paused this instant. Hide right away instead.
+                dbg("Now-playing source changed to an already-paused app (\(previousClientBundleId ?? "nil") -> \(clientBundleId ?? "nil")) — hiding immediately rather than starting a fresh countdown")
+                // Record it as an already-expired episode so it also stays hidden if
+                // the helper is rebuilt (e.g. across sleep/wake).
+                if persistedPausedSince == nil {
+                    persistedPausedSince = Date().addingTimeInterval(-TimeInterval(timeout))
+                }
+                handlePauseTimeout()
+                return
+            }
+            
+            // Already counting down for a genuine pause edge — leave it running
+            // rather than restarting the clock. A forced re-evaluation (e.g. the
+            // timeout preference just changed) always restarts with the fresh value.
+            guard forceReevaluate || inactivityTicker == nil else { return }
+            
+            // Only a real playing -> paused transition (or an explicit forced
+            // re-evaluation, e.g. the timeout preference changed) starts a fresh
+            // clock. Anything else — notably the first evaluation of a helper
+            // that was just (re)created after sleep/wake — must RESUME the pause
+            // episode already on record, otherwise a track that's been paused for
+            // an hour gets a brand new full countdown.
+            if previousIsPlaying == true || forceReevaluate || persistedPausedSince == nil {
+                persistedPausedSince = Date()
+            }
+            startInactivityCountdown(timeout: TimeInterval(timeout))
+        }
+    }
+    
+    /// Starts the pause countdown, measured from the start of the current pause
+    /// episode (`persistedPausedSince`). If that's already further back than the
+    /// timeout, hides immediately instead of showing the widget for another cycle.
+    private func startInactivityCountdown(timeout: TimeInterval) {
+        inactivityTicker?.invalidate()
+        let start = persistedPausedSince ?? Date()
+        pausedSince = start
+        let elapsed = Date().timeIntervalSince(start)
+        if elapsed >= timeout {
+            dbg("Paused for \(Int(elapsed))s already (timeout \(Int(timeout))s) — hiding immediately")
+            handlePauseTimeout()
+            return
+        }
+        let ticker = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.tickInactivityCountdown(timeout: timeout)
+        }
+        RunLoop.main.add(ticker, forMode: .common)
+        inactivityTicker = ticker
+        dbg("Pause countdown running — will hide in \(Int(timeout - elapsed))s (fresh clock: \(elapsed < 1))")
+    }
+    
+    /// Fires once a second while paused. Uses wall-clock elapsed time (rather
+    /// than counting ticks) so a delayed/late-firing timer — e.g. right after
+    /// the Mac wakes from sleep, when timers can fire in a burst to catch up —
+    /// still reports/hides at the correct moment instead of over- or under-counting.
+    private func tickInactivityCountdown(timeout: TimeInterval) {
+        guard let pausedSince = pausedSince else {
+            stopInactivityCountdown()
+            return
+        }
+        let elapsed = Date().timeIntervalSince(pausedSince)
+        let remaining = max(0, timeout - elapsed)
+        if elapsed >= timeout {
+            handlePauseTimeout()
         }
     }
     
     private func handlePauseTimeout() {
-        print("[NowPlayingHelper] Pause timeout fired — hiding widget")
+        dbg("Pause timeout fired — hiding widget")
+        // Keep the persisted pause start: the widget is hidden *because of* that
+        // episode, and must stay hidden across sleep/wake until playback resumes.
+        stopInactivityCountdown(clearPersistedPause: false)
         isHiddenDueToInactivity = true
-        NotificationCenter.default.post(name: .nowPlayingInactivityDidChange, object: nil)
+        NotificationCenter.default.post(name: .nowPlayingInactivityDidChange, object: self)
     }
     
-    private func stopInactivityTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
+    private func stopInactivityCountdown(clearPersistedPause: Bool = true) {
+        inactivityTicker?.invalidate()
+        inactivityTicker = nil
+        pausedSince = nil
+        if clearPersistedPause {
+            persistedPausedSince = nil
+        }
+    }
+    
+    // MARK: - Wake settling
+    
+    /// Time of the most recent system wake, straight from the kernel. Unlike our
+    /// own didWake handler this is also correct for a helper that was created
+    /// *after* the wake notification had already gone out.
+    private static func systemLastWakeDate() -> Date? {
+        var tv = timeval()
+        var size = MemoryLayout<timeval>.stride
+        guard sysctlbyname("kern.waketime", &tv, &size, nil, 0) == 0, tv.tv_sec > 0 else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(tv.tv_sec) + TimeInterval(tv.tv_usec) / 1_000_000)
+    }
+    
+    private var wakeSettleEnd: Date? {
+        let latestWake = [lastWakeHandled, NowPlayingHelper.systemLastWakeDate()].compactMap { $0 }.max()
+        return latestWake?.addingTimeInterval(NowPlayingHelper.wakeSettleSeconds)
+    }
+    
+    private var isInWakeSettle: Bool {
+        guard let end = wakeSettleEnd else { return false }
+        return end > Date()
+    }
+    
+    /// A "playing" report is only distrusted while (a) we're shortly after a wake,
+    /// (b) a pause episode is on record that it would wipe out, and (c) the user
+    /// didn't just press play themselves.
+    private func shouldDistrustPlayingReport() -> Bool {
+        guard persistedPausedSince != nil || isHiddenDueToInactivity else { return false }
+        guard isInWakeSettle else { return false }
+        if let t = lastUserToggle, Date().timeIntervalSince(t) < 15 { return false }
+        return true
+    }
+    
+    /// Once the settle window closes, ask the adapter what's really going on and
+    /// feed it through the normal path — a genuine "playing" then unhides the
+    /// widget, anything else leaves the pause episode untouched.
+    private func scheduleWakeReconcile() {
+        guard wakeReconcileWorkItem == nil else { return }
+        let delay = max(0.5, (wakeSettleEnd ?? Date()).timeIntervalSinceNow + 0.5)
+        let work = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.wakeReconcileWorkItem = nil
+            self.dbg("Wake settle window over — re-checking real playback state")
+            MediaRemoteAdapter.shared.getNowPlayingInfo { [weak self] info in
+                self?.updateWithInfo(info)
+            }
+        }
+        wakeReconcileWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
     
     /// Whether the widget should currently be suppressed due to a pause timeout.
@@ -254,14 +488,25 @@ class NowPlayingHelper {
         // Stop periodic refresh and kill timer
         stopPeriodicRefresh()
         stopKillTimer()
-        stopInactivityTimer()
+        // Quietly stop the ticker only. This must NOT clear the persisted pause
+        // start (a helper being torn down is exactly what happens around
+        // sleep/wake, and the replacement helper needs that record), and must not
+        // post notifications — the view is going away too.
+        inactivityTicker?.invalidate()
+        inactivityTicker = nil
+        pausedSince = nil
+        wakeReconcileWorkItem?.cancel()
+        wakeReconcileWorkItem = nil
         
         // Cancel any pending artwork fallback
         artworkFallbackWorkItem?.cancel()
         artworkFallbackWorkItem = nil
         
-        // Stop the adapter
-        MediaRemoteAdapter.shared.stopStreaming()
+        // Stop the shared adapter only if no other helper is still using it —
+        // otherwise a released old helper would kill the stream the new one needs.
+        if NowPlayingHelper.liveInstanceCount <= 0 {
+            MediaRemoteAdapter.shared.stopStreaming()
+        }
     }
     
     private func updateFromAdapter() {
@@ -379,10 +624,38 @@ class NowPlayingHelper {
     @objc private func handleSystemSleep(_ notification: Notification) {
         print("[NowPlayingHelper] System going to sleep - stopping adapter")
         MediaRemoteAdapter.shared.stopStreaming()
+        // Deliberately leave any running countdown alone here. `pausedSince` is
+        // a plain wall-clock Date, and the ticker's elapsed-time check is also
+        // wall-clock based (Date().timeIntervalSince(pausedSince)), not a tick
+        // count — so it doesn't need "catching up" or resetting. If a track was
+        // 8s into a 30s countdown when the Mac slept, it's correctly still 8s+
+        // (real elapsed sleep time) in once the run loop resumes, instead of
+        // being force-restarted at a fresh full timeout on every sleep/wake.
     }
     
     @objc private func handleSystemWake(_ notification: Notification) {
-        print("[NowPlayingHelper] System woke - restarting adapter and restoring widget")
+        lastWakeHandled = Date()
+        dbg("System woke - restarting adapter (paused-since on record: \(persistedPausedSince != nil), hidden: \(isHiddenDueToInactivity))")
+        
+        // No forced show/hide or countdown reset here on purpose — see
+        // handleSystemSleep. Restarting the adapter below fetches fresh info
+        // through the normal updateWithInfo -> resetInactivityTimer path, which
+        // only reacts to an *actual* play-state or source change (edge-detected
+        // against lastKnownIsPlaying / lastKnownClientBundleIdentifier, neither
+        // of which we touch here). So if playback is genuinely unchanged across
+        // the sleep — still paused on the same app, or still playing — nothing
+        // is disturbed: an in-progress countdown keeps counting from where it
+        // was, and an already-hidden widget stays hidden instead of flashing
+        // back into view. A real change (e.g. something actually got paused
+        // while asleep) still starts a fresh countdown as normal, since that's
+        // a genuine transition.
+        
+        // If a countdown was mid-flight when we slept, evaluate it against the
+        // wall clock right away (Timer.fire() runs the handler without disturbing
+        // the schedule) so it hides at once if the timeout passed during sleep.
+        if let ticker = inactivityTicker, ticker.isValid {
+            ticker.fire()
+        }
         
         // Give the system a moment to fully wake before restarting
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
@@ -397,16 +670,21 @@ class NowPlayingHelper {
             // Restart the stream
             MediaRemoteAdapter.shared.startStreaming()
             
-            // Restore the default client so widget is visible even if nothing is playing
-            let customDefaultPlayerIdentifier: String = Preferences[.defaultPlayer]
-            let displayName = NSWorkspace.shared.applicationName(for: customDefaultPlayerIdentifier)
-            let icon = NSWorkspace.shared.applicationIcon(for: customDefaultPlayerIdentifier, fallbackFileType: "mp3")
-            self.currentNowPlayingItem?.client = NowPlayingItem.Client(
-                bundleIdentifier: customDefaultPlayerIdentifier,
-                parentApplicationBundleIdentifier: nil,
-                displayName: displayName,
-                icon: icon
-            )
+            // Restore the default client so the widget is visible even if nothing
+            // is playing — but only if there's no client already. Overwriting an
+            // existing one (e.g. Spotify) with the default player made the next
+            // resetInactivityTimer() look like a source change mid-wake.
+            if self.currentNowPlayingItem?.client == nil {
+                let customDefaultPlayerIdentifier: String = Preferences[.defaultPlayer]
+                let displayName = NSWorkspace.shared.applicationName(for: customDefaultPlayerIdentifier)
+                let icon = NSWorkspace.shared.applicationIcon(for: customDefaultPlayerIdentifier, fallbackFileType: "mp3")
+                self.currentNowPlayingItem?.client = NowPlayingItem.Client(
+                    bundleIdentifier: customDefaultPlayerIdentifier,
+                    parentApplicationBundleIdentifier: nil,
+                    displayName: displayName,
+                    icon: icon
+                )
+            }
             
             // Force update the view so it reappears
             self.view?.updateContentViews()
@@ -565,6 +843,11 @@ class NowPlayingHelper {
             self.currentNowPlayingItem?.artist = nil
             self.currentNowPlayingItem?.artwork = nil
             self.currentNowPlayingItem?.isPlaying = false
+            
+            // Re-evaluate the pause timeout now that isPlaying is false — this
+            // branch used to skip this entirely, so a transition straight to
+            // "no info" never started the countdown.
+            self.resetInactivityTimer()
             
             // If we already have a client from any source, preserve it.
             // The client will be cleared explicitly when the app terminates
@@ -728,7 +1011,8 @@ class NowPlayingHelper {
     }
     
     deinit {
-        NSLog("[NOW_PLAYING]: NowPlayingHelper - deinit")
+        NowPlayingHelper.liveInstanceCount -= 1
+        NSLog("[NOW_PLAYING]: NowPlayingHelper#\(instanceId) - deinit (live helpers left: \(NowPlayingHelper.liveInstanceCount))")
         view = nil
         currentNowPlayingItem = nil
         unregisterForNotifications()
@@ -739,16 +1023,19 @@ class NowPlayingHelper {
 extension NowPlayingHelper {
     
     public func togglePlayingState() {
+        lastUserToggle = Date()
         print("[NowPlayingHelper] togglePlayingState called")
         MediaRemoteAdapter.shared.sendCommand(.togglePlayPause)
     }
     
     public func skipToNextTrack() {
+        lastUserToggle = Date()
         print("[NowPlayingHelper] skipToNextTrack called")
         MediaRemoteAdapter.shared.sendCommand(.nextTrack)
     }
     
     public func skipToPreviousTrack() {
+        lastUserToggle = Date()
         print("[NowPlayingHelper] skipToPreviousTrack called")
         MediaRemoteAdapter.shared.sendCommand(.previousTrack)
     }

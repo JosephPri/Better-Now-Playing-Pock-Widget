@@ -209,7 +209,9 @@ class MediaRemoteAdapter {
             }
             
             let isDiff = (json["diff"] as? Bool) ?? false
-            let newInfo = self.parsePayload(payload, isDiff: isDiff)
+            // Already on stateQueue here — safe to read _currentInfo directly
+            // (going through the synced `currentInfo` accessor would deadlock).
+            let newInfo = self.parsePayload(payload, isDiff: isDiff, fallbackIsPlaying: self._currentInfo?.isPlaying)
             
             // Clear state if empty full update (app closed)
             if !isDiff && newInfo?.bundleIdentifier == nil && newInfo?.title == nil {
@@ -278,7 +280,14 @@ class MediaRemoteAdapter {
         }
     }
     
-    private func parsePayload(_ payload: [String: Any], isDiff: Bool) -> NowPlayingInfo? {
+    /// - Parameter fallbackIsPlaying: what to use for `isPlaying` when a *full*
+    ///   (non-diff) update omits the "playing" key entirely. Passed in rather
+    ///   than read from `_currentInfo`/`currentInfo` here because this method is
+    ///   called from two different queue contexts (see call sites below) with
+    ///   different rules for touching that shared state safely — reading it here
+    ///   directly would either race off-queue or deadlock on-queue depending on
+    ///   the caller, so each caller resolves it the way that's safe for it.
+    private func parsePayload(_ payload: [String: Any], isDiff: Bool, fallbackIsPlaying: Bool?) -> NowPlayingInfo? {
         // Start from current state for diffs, fresh struct for full updates
         var info: NowPlayingInfo = isDiff ? (_currentInfo ?? NowPlayingInfo()) : NowPlayingInfo()
         
@@ -300,6 +309,16 @@ class MediaRemoteAdapter {
         if let v = payload["parentApplicationBundleIdentifier"] as? String { info.parentApplicationBundleIdentifier = v }
         if let v = payload["playing"] as? Bool                             { info.isPlaying = v }
         else if let v = payload["playing"] as? Int                         { info.isPlaying = v == 1 }
+        else if !isDiff                                                    {
+            // A "full" (non-diff) update that's missing the "playing" key entirely
+            // is almost certainly incomplete data, not a real "not playing" state —
+            // fall back to the last known value instead of silently defaulting to
+            // false. Previously this defaulted `info.isPlaying` to `false` (from the
+            // fresh NowPlayingInfo()), which could masquerade as a genuine pause and
+            // feed a spurious isPlaying-changed notification into the app, resetting
+            // the auto-hide countdown from scratch for no real reason.
+            info.isPlaying = fallbackIsPlaying ?? false
+        }
         if let v = payload["title"]  as? String { info.title  = v }
         if let v = payload["artist"] as? String { info.artist = v }
         if let v = payload["album"]  as? String { info.album  = v }
@@ -311,7 +330,9 @@ class MediaRemoteAdapter {
     
     private func parseNowPlayingData(_ data: Data) -> NowPlayingInfo? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
-        return parsePayload(json, isDiff: false)
+        // Not on stateQueue here (called from getNowPlayingInfo's background
+        // queue) — safe to use the synced `currentInfo` accessor.
+        return parsePayload(json, isDiff: false, fallbackIsPlaying: currentInfo?.isPlaying)
     }
 }
 

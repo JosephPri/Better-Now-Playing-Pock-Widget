@@ -87,7 +87,7 @@ class NowPlayingView: PKView {
         NotificationCenter.default.addObserver(self, selector: #selector(configureUIElements), name: Notification.Name(didChangeNowPlayingWidgetStyle), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkSizeChange), name: Notification.Name(didChangeArtworkSizeNotification), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleArtworkGlowChange), name: Notification.Name(didChangeArtworkGlowNotification), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleInactivityChange), name: .nowPlayingInactivityDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleInactivityChange), name: .nowPlayingInactivityDidChange, object: helper)
         NotificationCenter.default.addObserver(self, selector: #selector(handleInactivityPreferenceChange), name: Notification.Name(didChangeInactivityTimeoutNotification), object: nil)
     }
     
@@ -98,6 +98,10 @@ class NowPlayingView: PKView {
         if shouldLoadHelper {
             helper = NowPlayingHelper(forView: self)
             registerForNotifications()
+            // The helper may already know the widget should be hidden (resumed pause
+            // episode) but its notification fired before we were observing, and
+            // `helper` wasn't assigned yet during its init — so apply it now.
+            updateContentViews()
         }
         UpdateChecker.checkForUpdate { [weak self] available, version in
             guard available, let self = self else { return }
@@ -135,7 +139,10 @@ class NowPlayingView: PKView {
     /// Called when the user changes the inactivity preference in the pref pane —
     /// restart the timer with the new settings (helper handles the logic).
     @objc private func handleInactivityPreferenceChange() {
-        helper?.resetInactivityTimer()
+        // Force re-evaluation: the play state itself hasn't changed here, only
+        // the preference has, so the normal edge-detection in resetInactivityTimer
+        // would otherwise ignore this call.
+        helper?.resetInactivityTimer(forceReevaluate: true)
         updateContentViews()
     }
     
