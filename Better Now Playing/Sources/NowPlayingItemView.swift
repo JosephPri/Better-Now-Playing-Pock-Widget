@@ -304,11 +304,43 @@ class NowPlayingItemView: PKDetailView {
         }
     }
     
+    // MARK: - Swipe sensitivity
+    
+    /// Minimum horizontal finger travel (in Touch Bar points) before a touch counts
+    /// as a swipe. PockKit treats *any* sideways movement as a swipe, so a normal tap
+    /// with a tiny finger drift used to skip the track. Raise this to make swiping
+    /// harder to trigger, lower it to make it easier.
+    private static let minimumSwipeDistance: CGFloat = 10
+    
+    /// Where the current touch began. PKView keeps this private, so read it by reflection.
+    /// Returns nil if it can't be found (e.g. a different PockKit version).
+    private var touchStartPosition: NSPoint? {
+        var mirror: Mirror? = Mirror(reflecting: self)
+        while let m = mirror {
+            if let child = m.children.first(where: { $0.label == "initialPosition" }) {
+                return child.value as? NSPoint
+            }
+            mirror = m.superclassMirror
+        }
+        return nil
+    }
+    
+    /// True if the touch that is ending moved far enough to be a deliberate swipe.
+    /// Falls back to true (the old behaviour) if the distance can't be measured.
+    private var currentTouchIsDeliberateSwipe: Bool {
+        guard let start = touchStartPosition,
+              let touch = NSApp.currentEvent?.allTouches().first else { return true }
+        let end = touch.location(in: superview)
+        return abs(end.x - start.x) >= NowPlayingItemView.minimumSwipeDistance
+    }
+    
     override open func didTapHandler() {
         self.didTap?()
     }
     
     override open func didSwipeLeftHandler() {
+        // Too little movement — the user meant to tap
+        guard currentTouchIsDeliberateSwipe else { didTapHandler(); return }
         if Preferences[.invertSwipeGesture] {
             self.didSwipeRight?()
         } else {
@@ -317,6 +349,7 @@ class NowPlayingItemView: PKDetailView {
     }
     
     override open func didSwipeRightHandler() {
+        guard currentTouchIsDeliberateSwipe else { didTapHandler(); return }
         if Preferences[.invertSwipeGesture] {
             self.didSwipeLeft?()
         } else {
