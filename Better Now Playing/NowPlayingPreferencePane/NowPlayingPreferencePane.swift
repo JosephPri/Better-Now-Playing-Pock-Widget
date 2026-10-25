@@ -17,6 +17,8 @@ extension NSNotification.Name {
 class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     
     static var nibName: NSNib.Name = "NowPlayingPreferencePane"
+
+    private static let inactivityTimeouts = [10, 30, 60, 120, 300, 600]
     
     @IBOutlet private weak var imagesStackView:         NSStackView!
     @IBOutlet private weak var defaultRadioButton:      NSButton!
@@ -27,6 +29,7 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     @IBOutlet private weak var invertSwipeGesture:      NSButton!
     @IBOutlet private weak var artworkSizeSlider:        NSSlider!
     @IBOutlet private weak var artworkGlowCheckbox:      NSButton!
+    @IBOutlet private weak var artworkFallbackCheckbox:  NSButton!
     @IBOutlet private weak var hideAfterInactivityCheckbox: NSButton!
     @IBOutlet private weak var inactivityTimeoutPopup:  NSPopUpButton!
     // Fixed width controls
@@ -61,13 +64,14 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
         animateIconWhilePlaying.state = Preferences[.animateIconWhilePlaying] ? .on : .off
         invertSwipeGesture.state      = Preferences[.invertSwipeGesture]      ? .on : .off
         artworkGlowCheckbox?.state    = Preferences[.artworkGlow]             ? .on : .off
+        artworkFallbackCheckbox?.state = Preferences[.artworkFallback]        ? .on : .off
         let inactivityEnabled: Bool   = Preferences[.hideAfterInactivity]
         hideAfterInactivityCheckbox?.state = inactivityEnabled ? .on : .off
         inactivityTimeoutPopup?.isEnabled  = inactivityEnabled
         // Sync popup selection to stored timeout value
         let storedTimeout: Int = Preferences[.inactivityTimeout]
         if let popup = inactivityTimeoutPopup {
-            let timeouts = [10, 30, 60, 120, 300, 600]
+            let timeouts = NowPlayingPreferencePane.inactivityTimeouts
             let idx = timeouts.firstIndex(of: storedTimeout) ?? 3   // default to 120s
             if idx < popup.numberOfItems { popup.selectItem(at: idx) }
         }
@@ -126,6 +130,8 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
             Preferences[.invertSwipeGesture] = button.state == .on
         case 4:
             Preferences[.artworkGlow] = button.state == .on
+        case 6:
+            Preferences[.artworkFallback] = button.state == .on
         case 5:
             // Disable native Now Playing Touch Bar
             let newValue = button.state == .on
@@ -146,7 +152,7 @@ class NowPlayingPreferencePane: NSViewController, PKWidgetPreference {
     }
     
     @IBAction private func didChangeInactivityTimeout(_ sender: NSPopUpButton) {
-        let timeouts = [10, 30, 60, 120, 300]
+        let timeouts = NowPlayingPreferencePane.inactivityTimeouts
         let idx = sender.indexOfSelectedItem
         let chosen = (idx >= 0 && idx < timeouts.count) ? timeouts[idx] : 30
         Preferences[.inactivityTimeout] = chosen

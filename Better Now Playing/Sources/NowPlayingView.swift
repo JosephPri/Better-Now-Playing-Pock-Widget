@@ -47,6 +47,9 @@ class NowPlayingView: PKView {
     private var shouldHideWidget: Bool {
         // Inactivity timeout takes priority — always hide when it fires
         if helper?.shouldHideDueToInactivity == true { return true }
+        // Apple Music reports a placeholder "AutoPlay" item (no artist) when autoplay
+        // can't find a next song. There's nothing real to show, so hide the widget.
+        if let item = item, item.title == "AutoPlay", item.artist?.isEmpty ?? true { return true }
         if Preferences[.hideNowPlayingIfNoMedia] {
             guard let item = item else {
                 return true

@@ -63,6 +63,13 @@ class NowPlayingItemView: PKDetailView {
         imageView.wantsLayer = true
         imageView.layer?.masksToBounds = true
         
+        // ScrollingTextView draws its wrap-around copy outside its own bounds and never
+        // clips. Without this, stale text pixels can be left on top of the artwork.
+        [titleView, subtitleView, labelsContainer].forEach { v in
+            v?.wantsLayer = true
+            v?.layer?.masksToBounds = true
+        }
+        
         // Keep title and artist tight together regardless of image size
         labelsContainer.distribution = .fillEqually
         labelsContainer.spacing = 0

@@ -941,9 +941,16 @@ class NowPlayingHelper {
                         // Poll also had no artwork — now clear old art and fall back to iTunes
                         self.currentNowPlayingItem?.artwork = nil
                         self.view?.updateContentViews()
+                        // User turned the iTunes artwork fallback off — leave artwork blank
+                        guard Preferences[.artworkFallback] else {
+                            print("[NowPlayingHelper] updateWithInfo - artwork fallback disabled, skipping iTunes API")
+                            return
+                        }
                         let snapshot = self.currentNowPlayingItem
                         let workItem = DispatchWorkItem { [weak self] in
                             guard let self = self else { return }
+                            // Setting may have been switched off during the 1s delay
+                            guard Preferences[.artworkFallback] else { return }
                             if let adapterInfo = MediaRemoteAdapter.shared.currentInfo, adapterInfo.hasAdapterArtwork {
                                 print("[NowPlayingHelper] updateWithInfo - adapter artwork arrived, skipping iTunes API")
                                 return

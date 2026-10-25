@@ -23,6 +23,8 @@ internal struct Preferences {
         case defaultPlayer
         case artworkSize
         case artworkGlow
+        /// Whether to fall back to the iTunes Search API when the player supplies no artwork.
+        case artworkFallback
         /// Whether to hide the widget after a period of inactivity (no playback).
         case hideAfterInactivity
         /// Seconds of inactivity before the widget hides. 0 = disabled.
@@ -54,6 +56,8 @@ internal struct Preferences {
                     }
                 case .artworkGlow:
                     return true as! T
+                case .artworkFallback:
+                    return true as! T
                 case .artworkSize:
                     return 0 as! T
                 case .hideAfterInactivity:
@@ -81,6 +85,7 @@ internal struct Preferences {
         Preferences[.animateIconWhilePlaying] = false
         Preferences[.invertSwipeGesture] = false
         Preferences[.artworkGlow] = true
+        Preferences[.artworkFallback] = true
         Preferences[.artworkSize] = 0
         Preferences[.hideAfterInactivity] = true
         Preferences[.inactivityTimeout] = 120
